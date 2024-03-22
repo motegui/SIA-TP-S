@@ -1,17 +1,27 @@
 import collections
+from copy import copy, deepcopy
+
+WALL = '#'
+BOX = '$'
+EMPTY = ' '
+
+
+def IS_SOLID(x):
+    return x == '#' or x == '$'
 
 
 class Node:
-    def __init__(self, parent=None, position=None):
+    def __init__(self, parent=None, position=None, state=None):
         self.parent = parent
         self.position = position
+        self.state = state
 
         self.g = 0
         self.h = 0
         self.f = 0
 
     def __eq__(self, other):
-        return self.position == other.position
+        return all([a == b for a, b in zip(self.state, other.state)]) and self.position == other.position
 
 
 def bfs(maze, start_position, end_position, generate_children):
@@ -177,24 +187,30 @@ def manhattan_distance(pos1, pos2):
     return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
 
-def generate_children_maze(current_node, maze):
+def generate_new_state(current_node, new_position):
+    new_map = deepcopy(current_node.state)
+    new_map[current_node.position[0]][current_node.position[1]] = EMPTY
+    if new_map[current_node.position[0] + new_position[0]][current_node.position[1] + new_position[1]] == BOX:
+        new_map[current_node.position[0] + 2 * new_position[0]][current_node.position[1] + 2 * new_position[1]] = BOX
+    return new_map
+
+
+def generate_children_maze(current_node):
     children = []
     for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0)]:  # Adjacent squares
-
         # Get node position
         node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
 
-        # Make sure within range
-        if node_position[0] > (len(maze) - 1) or node_position[0] < 0 or node_position[1] > (
-                len(maze[len(maze) - 1]) - 1) or node_position[1] < 0:
-            continue
-
         # Make sure walkable terrain
-        if maze[node_position[0]][node_position[1]] != 0:
+        if current_node.state[node_position[0]][node_position[1]] == WALL:
             continue
+        if current_node.state[node_position[0]][node_position[1]] == BOX:
+            new_box_position = (node_position[0] + new_position[0], node_position[1] + new_position[1])
+            if IS_SOLID(current_node.state[new_box_position[0]][new_box_position[1]]):
+                continue
 
         # Create new node
-        new_node = Node(current_node, node_position)
+        new_node = Node(current_node, node_position, generate_new_state(current_node, new_position))
 
         # Append
         children.append(new_node)
@@ -221,7 +237,31 @@ def main():
             [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
             [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
             [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0]]
+    sokoban_map = [
+        [' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', '#', '.', '#', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', '#', '#', '#', '#', '#', '.', '#', '#', '#', '#', '#', ' ', ' '],
+        [' ', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' '],
+        ['#', '#', ' ', ' ', '#', ' ', '#', ' ', '#', ' ', '#', ' ', ' ', '#', '#'],
+        ['#', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', '#'],
+        ['#', ' ', '#', '#', ' ', ' ', '#', ' ', '#', ' ', ' ', '#', '#', ' ', '#'],
+        ['#', ' ', ' ', ' ', ' ', ' ', '$', ' ', '$', ' ', ' ', ' ', ' ', ' ', '#'],
+        ['#', '#', '#', '#', ' ', ' ', '#', '#', '#', ' ', ' ', '#', '#', '#', '#'],
+        [' ', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ']
+    ]
 
+    sokoban_goal = [
+        [' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', '#', '$', '#', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', '#', '#', '#', '#', '#', '$', '#', '#', '#', '#', '#', ' ', ' '],
+        [' ', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' '],
+        ['#', '#', ' ', ' ', '#', ' ', '#', ' ', '#', ' ', '#', ' ', ' ', '#', '#'],
+        ['#', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', '#'],
+        ['#', ' ', '#', '#', ' ', ' ', '#', ' ', '#', ' ', ' ', '#', '#', ' ', '#'],
+        ['#', ' ', ' ', ' ', ' ', ' ', '.', ' ', '.', ' ', ' ', ' ', ' ', ' ', '#'],
+        ['#', '#', '#', '#', ' ', ' ', '#', '#', '#', ' ', ' ', '#', '#', '#', '#'],
+        [' ', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ']
+    ]
     start = (0, 0)
     end = (7, 10)
 
@@ -231,5 +271,7 @@ def main():
 
 # [(0, 0), (1, 1), (2, 2), (3, 3), (4, 3), (5, 3), (6, 4), (7, 5), (7, 6)]
 # [(0, 0), (1, 1), (2, 2), (3, 3), (4, 3), (5, 3), (6, 4), (7, 5), (7, 6)]
+
+
 if __name__ == '__main__':
     main()
