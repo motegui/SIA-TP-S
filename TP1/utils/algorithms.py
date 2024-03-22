@@ -1,41 +1,7 @@
 import collections
 
 
-def bfs(graph, root):
-    visited = set()
-    queue = collections.deque([root])
-    visited.add(root)
-    print("root: " + str(root))
-
-    while queue:
-        vertex = queue.popleft()
-        print("node: " + str(vertex))
-
-        # Llamar a generate children aca porque no los tenes de entrada...
-        for neighbour in graph[vertex]:
-            if neighbour not in visited:
-                visited.add(neighbour)
-                queue.append(neighbour)
-
-
-def dfs(graph, root):
-    visited = set()
-    queue = collections.deque([root])
-    visited.add(root)
-    print("root: " + str(root))
-
-    while queue:
-        vertex = queue.pop()
-        print("node: " + str(vertex))
-
-        # Llamar a generate children aca porque no los tenes de entrada...
-        for neighbour in graph[vertex]:
-            if neighbour not in visited:
-                visited.add(neighbour)
-                queue.append(neighbour)
-
-
-class Node():
+class Node:
     def __init__(self, parent=None, position=None):
         self.parent = parent
         self.position = position
@@ -47,130 +13,176 @@ class Node():
     def __eq__(self, other):
         return self.position == other.position
 
-def local_greedy(maze, startPosition, endPosition, generateChildren, heuristic):
 
-    initialNode = Node(None, startPosition)
-    initialNode.h = initialNode.g = initialNode.f = 0
+def bfs(maze, start_position, end_position, generate_children):
+    initial_node = Node(None, start_position)
+    end_node = Node(None, end_position)
+    closed_list = []
+    opened_list = collections.deque([initial_node])
+    closed_list.append(initial_node)
 
-    endNode = Node(None, endPosition)
-    endNode.h = endNode.g = endNode.f = 0
+    while opened_list:
+        current_node = opened_list.popleft()
+        if current_node.position == end_node.position:
+            return create_path(initial_node, current_node)
 
-    openList = [initialNode]
-    closedList = []
+        # Llamar a generate children aca porque no los tenes de entrada...
+        for child in generate_children(current_node, maze):
+            if child not in closed_list:
+                closed_list.append(child)
+                opened_list.append(child)
 
-    while openList:
-        currentNode = openList.pop(0)
-        closedList.append(currentNode)
 
-        if currentNode == endNode:
-            path = [currentNode.position]
-            while currentNode != initialNode:
-                currentNode = currentNode.parent
-                path.append(currentNode.position)
-            return path[::-1]  # Doy vuelta asi arranca por el nodo inicial.
+def dfs(maze, start_position, end_position, generate_children):
+    initial_node = Node(None, start_position)
+    end_node = Node(None, end_position)
+    closed_list = [initial_node]
+    opened_list = collections.deque([initial_node])
 
-        # Generar los nodos hijos y agregar
-        children = generateChildren(currentNode, maze)
+    while opened_list:
+        current_node = opened_list.pop()
+        if current_node.position == end_node.position:
+            return create_path(initial_node, current_node)
 
-        lowestHChild = None
-        lowestH = float('inf')
+        # Llamar a generate children aca porque no los tenes de entrada...
+        for child in generate_children(current_node, maze):
+            if child not in closed_list:
+                closed_list.append(child)
+                opened_list.append(child)
 
+
+def local_greedy(maze, start_position, end_position, generate_children, heuristic):
+    closed_list = []
+
+    initial_node = Node(None, start_position)
+    initial_node.h = initial_node.g = initial_node.f = 0
+
+    end_node = Node(None, end_position)
+    end_node.h = end_node.g = end_node.f = 0
+
+    opened_list = collections.deque([initial_node])
+    closed_list.append(initial_node)
+
+    while opened_list:
+        current_node = opened_list.pop()
+
+        if current_node.position == end_node.position:
+            return create_path(initial_node, current_node)
+
+        ordered_children = sorted(generate_children(current_node, maze), key=lambda x: x.h, reverse=True)
+        # Llamar a generate children aca porque no los tenes de entrada...
+        for child in ordered_children:
+            child.g = current_node.g + 1  # distancia hasta aca + distancia de ir de current a child
+            child.h = heuristic(child.position, end_position)
+            child.f = child.g + child.h
+
+            if child not in closed_list:
+                closed_list.append(child)
+                opened_list.append(child)
+
+
+def global_greedy(maze, start_position, end_position, generate_children, heuristic):
+    closed_list = []
+
+    initial_node = Node(None, start_position)
+    initial_node.h = initial_node.g = initial_node.f = 0
+
+    end_node = Node(None, end_position)
+    end_node.h = end_node.g = end_node.f = 0
+
+    opened_list = collections.deque([initial_node])
+    closed_list.append(initial_node)
+
+    while opened_list:
+        current_node = opened_list.pop()
+
+        if current_node.position == end_node.position:
+            return create_path(initial_node, current_node)
+
+        children = generate_children(current_node, maze)
+        # Llamar a generate children aca porque no los tenes de entrada...
         for child in children:
+            child.g = current_node.g + 1  # distancia hasta aca + distancia de ir de current a child
+            # (entiendo que es 1 porque es 1 movimiento...)
+            child.h = heuristic(child.position, end_position)
+            child.f = child.g + child.h
 
-            isClosed = False
-            for closedChild in closedList:
-                if closedChild == child:
-                    isClosed = True
+            if child not in closed_list:
+                closed_list.append(child)
+                opened_list.append(child)
 
-            if isClosed:
-                continue
+        opened_list = collections.deque(sorted(opened_list, key=lambda x: x.h, reverse=True))
 
-            if child not in closedList:
-                child.g = currentNode.g + 1  # distancia hasta aca + distancia de ir de current a child (entiendo que es 1 porque es 1 movimiento...)
-                child.h = heuristic(child.position, endPosition)
-                child.f = child.g + child.h
-
-            if child.h < lowestH:
-                lowestHChild = child
-                lowestH = child.h
-
-        if lowestHChild:
-            openList.append(lowestHChild)
 
 # Para saber que nodo expandir, calcula la euristica
 # en vez de queue.pop, busco el mejor.
 
 # Generate children devuelve un array de hijos dado el nodo. (movimientos posibles desde un tablero)
-def astar(maze, startPosition, endPosition, generateChildren, heuristic):
+# Generate children devuelve un array de hijos dado el nodo. (movimientos posibles desde un tablero)
+def astar(maze, start_position, end_position, generate_children, heuristic):
+    initial_node = Node(None, start_position)
+    initial_node.h = initial_node.g = initial_node.f = 0
 
-    initialNode = Node(None, startPosition)
-    initialNode.h = initialNode.g =  initialNode.f = 0
+    end_node = Node(None, end_position)
+    end_node.h = end_node.g = end_node.f = 0
 
-    endNode = Node(None, endPosition)
-    endNode.h = endNode.g = endNode.f = 0
+    opened_list = [initial_node]
+    closed_list = []
 
-    openList = [initialNode]
-    closedList = []
-
-    while openList:
-        currentNode = openList[0]
-        currentIndex = 0
+    while opened_list:
+        current_node = opened_list[0]
+        current_index = 0
         # Calculo el nodo de menor f. (f = g + h)
-        for (i, node) in enumerate(openList):
-            if node.f < currentNode.f:
-                currentNode = node
-                currentIndex = i
+        for (i, node) in enumerate(opened_list):
+            if node.f == current_node.f and node.h < current_node.h:
+                current_node = node
+                current_index = i
+            elif node.f < current_node.f:
+                current_node = node
+                current_index = i
 
-        openList.pop(currentIndex)
-        closedList.append(currentNode)
+        opened_list.pop(current_index)
+        closed_list.append(current_node)
 
-        if currentNode == endNode:
-            path = [currentNode.position]
-            while currentNode != initialNode:
-                currentNode = currentNode.parent
-                path.append(currentNode.position)
-            return path[::-1]  # Doy vuelta asi arranca por el nodo inicial.
+        if current_node.position == end_node.position:
+            return create_path(initial_node, current_node)
 
         # Generar los nodos hijos y agregar
-        children = generateChildren(currentNode, maze)
+        children = generate_children(current_node, maze)
 
         for child in children:
-
-            isClosed = False
-            for closedChild in closedList:
-                if closedChild == child:
-                    isClosed = True
-
-            if isClosed:
+            if child in closed_list:
                 continue
 
-            if child not in closedList:
-                child.g = currentNode.g + 1  # distancia hasta aca + distancia de ir de current a child (entiendo que es 1 porque es 1 movimiento...)
-                child.h = heuristic(child.position, endPosition)
-                child.f = child.g + child.h
+            child.g = current_node.g + 1  # distancia hasta aca + distancia de ir de current a child (entiendo que es
+            # 1 porque es 1 movimiento...)
+            child.h = heuristic(child.position, end_position)
+            child.f = child.g + child.h
 
-            isOpen = False
-            for openNode in openList:
-                if child == openNode and child.g > openNode.g:
-                    isOpen = True
+            is_open = False
+            for openNode in opened_list:
+                if child.position == openNode.position and child.g > openNode.g:
+                    is_open = True
 
-            if isOpen:
+            if is_open:
                 continue
-            openList.append(child)
+            opened_list.append(child)
 
 
-def heuristic(position, endPosition):
-    return ((position[0] - endPosition[0]) ** 2) + ((position[1] - endPosition[1]) ** 2)
+def euclidean_heuristic(position, end_position):
+    return ((position[0] - end_position[0]) ** 2) + ((position[1] - end_position[1]) ** 2)
+
 
 def manhattan_distance(pos1, pos2):
-  return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
+    return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
-def generateChildren(currentNode, maze):
+
+def generate_children_maze(current_node, maze):
     children = []
-    for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]:  # Adjacent squares
+    for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0)]:  # Adjacent squares
 
         # Get node position
-        node_position = (currentNode.position[0] + new_position[0], currentNode.position[1] + new_position[1])
+        node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
 
         # Make sure within range
         if node_position[0] > (len(maze) - 1) or node_position[0] < 0 or node_position[1] > (
@@ -182,7 +194,7 @@ def generateChildren(currentNode, maze):
             continue
 
         # Create new node
-        new_node = Node(currentNode, node_position)
+        new_node = Node(current_node, node_position)
 
         # Append
         children.append(new_node)
@@ -190,24 +202,32 @@ def generateChildren(currentNode, maze):
     return children
 
 
-def main():
+def create_path(initial_node, current_node):
+    path = [current_node.position]
+    while current_node.position != initial_node.position:
+        current_node = current_node.parent
+        path.append(current_node.position)
+    return path[::-1]  # Doy vuelta asi arranca por el nodo inicial.
 
-    maze = [[0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+def main():
+    maze = [[0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+            [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+            [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+            [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+            [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+            [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+            [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+            [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+            [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0]]
 
     start = (0, 0)
-    end = (7, 6)
+    end = (7, 10)
 
-    path = astar(maze, start, end, generateChildren, manhattan_distance)
+    path = astar(maze, start, end, generate_children_maze, euclidean_heuristic)
     print(path)
+
 
 # [(0, 0), (1, 1), (2, 2), (3, 3), (4, 3), (5, 3), (6, 4), (7, 5), (7, 6)]
 # [(0, 0), (1, 1), (2, 2), (3, 3), (4, 3), (5, 3), (6, 4), (7, 5), (7, 6)]
