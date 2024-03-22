@@ -23,6 +23,8 @@ class Node:
     def __eq__(self, other):
         return all([a == b for a, b in zip(self.state, other.state)]) and self.position == other.position
 
+    def map_equals(self, other):
+        return all([a == b for a, b in zip(self.state, other.state)])
 
 def bfs(maze, start_position, end_position, generate_children):
     initial_node = Node(None, start_position)
@@ -129,36 +131,46 @@ def global_greedy(maze, start_position, end_position, generate_children, heurist
 
 # Generate children devuelve un array de hijos dado el nodo. (movimientos posibles desde un tablero)
 # Generate children devuelve un array de hijos dado el nodo. (movimientos posibles desde un tablero)
-def astar(maze, start_position, end_position, generate_children, heuristic):
-    initial_node = Node(None, start_position)
-    initial_node.h = initial_node.g = initial_node.f = 0
+def astar(map, start_position, goal_map, generate_children, heuristic):
 
-    end_node = Node(None, end_position)
+    initial_node = Node(None, start_position, map)
+    initial_node.h = heuristic(map, goal_map)
+    initial_node.g = 0
+    initial_node.f = initial_node.h
+
+    end_node = Node(None, None, goal_map)
     end_node.h = end_node.g = end_node.f = 0
 
     opened_list = [initial_node]
     closed_list = []
 
     while opened_list:
-        current_node = opened_list[0]
-        current_index = 0
-        # Calculo el nodo de menor f. (f = g + h)
-        for (i, node) in enumerate(opened_list):
-            if node.f == current_node.f and node.h < current_node.h:
-                current_node = node
-                current_index = i
-            elif node.f < current_node.f:
-                current_node = node
-                current_index = i
 
-        opened_list.pop(current_index)
+        current_node = min(opened_list, key=lambda x: x.f)
+        opened_list.remove(current_node)
         closed_list.append(current_node)
+        print(current_node.position)
+        print(current_node.state)
 
-        if current_node.position == end_node.position:
+        # current_node = opened_list[0]
+        # current_index = 0
+        # Calculo el nodo de menor f. (f = g + h)
+        # for (i, node) in enumerate(opened_list):
+        #     if node.f == current_node.f and node.h < current_node.h:
+        #         current_node = node
+        #         current_index = i
+        #     elif node.f < current_node.f:
+        #         current_node = node
+        #         current_index = i
+        #
+        # opened_list.pop(current_index)
+        # closed_list.append(current_node)
+
+        if current_node.map_equals(end_node):
             return create_path(initial_node, current_node)
 
         # Generar los nodos hijos y agregar
-        children = generate_children(current_node, maze)
+        children = generate_children(current_node)
 
         for child in children:
             if child in closed_list:
@@ -166,12 +178,12 @@ def astar(maze, start_position, end_position, generate_children, heuristic):
 
             child.g = current_node.g + 1  # distancia hasta aca + distancia de ir de current a child (entiendo que es
             # 1 porque es 1 movimiento...)
-            child.h = heuristic(child.position, end_position)
+            child.h = heuristic(child.state, goal_map)
             child.f = child.g + child.h
 
             is_open = False
             for openNode in opened_list:
-                if child.position == openNode.position and child.g > openNode.g:
+                if child.map_equals(openNode) and child.g > openNode.g:
                     is_open = True
 
             if is_open:
@@ -186,12 +198,30 @@ def euclidean_heuristic(position, end_position):
 def manhattan_distance(pos1, pos2):
     return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
+def sokoban_heuristic(state, goal_map):
+    total_distance = 0
+
+    for i in range(len(state)):
+        for j in range(len(state[0])):
+            if state[i][j] == BOX:
+                # Encontrar la distancia mínima de la caja al objetivo correspondiente
+                min_distance = float('inf')
+                for k in range(len(goal_map)):
+                    for l in range(len(goal_map[0])):
+                        if goal_map[k][l] == '$':
+                            distance = abs(i - k) + abs(j - l)
+                            min_distance = min(min_distance, distance)
+                total_distance += min_distance
+
+    return total_distance
+
 
 def generate_new_state(current_node, new_position):
     new_map = deepcopy(current_node.state)
     new_map[current_node.position[0]][current_node.position[1]] = EMPTY
     if new_map[current_node.position[0] + new_position[0]][current_node.position[1] + new_position[1]] == BOX:
-        new_map[current_node.position[0] + 2 * new_position[0]][current_node.position[1] + 2 * new_position[1]] = BOX
+        new_box_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
+        new_map[new_box_position[0] + new_position[0]][new_box_position[1] + new_position[1]] = BOX
     return new_map
 
 
@@ -209,8 +239,10 @@ def generate_children_maze(current_node):
             if IS_SOLID(current_node.state[new_box_position[0]][new_box_position[1]]):
                 continue
 
+        new_state = generate_new_state(current_node, new_position)
+
         # Create new node
-        new_node = Node(current_node, node_position, generate_new_state(current_node, new_position))
+        new_node = Node(current_node, node_position, new_state)
 
         # Append
         children.append(new_node)
@@ -239,8 +271,8 @@ def main():
             [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0]]
     sokoban_map = [
         [' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', '#', '.', '#', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', '#', '#', '#', '#', '#', '.', '#', '#', '#', '#', '#', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', ' '],
         [' ', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' '],
         ['#', '#', ' ', ' ', '#', ' ', '#', ' ', '#', ' ', '#', ' ', ' ', '#', '#'],
         ['#', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', '#'],
@@ -262,10 +294,9 @@ def main():
         ['#', '#', '#', '#', ' ', ' ', '#', '#', '#', ' ', ' ', '#', '#', '#', '#'],
         [' ', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ']
     ]
-    start = (0, 0)
-    end = (7, 10)
+    start = (7, 7)
 
-    path = astar(maze, start, end, generate_children_maze, euclidean_heuristic)
+    path = astar(sokoban_map, start, sokoban_goal, generate_children_maze, sokoban_heuristic)
     print(path)
 
 
