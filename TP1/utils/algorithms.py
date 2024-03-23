@@ -26,38 +26,43 @@ class Node:
     def map_equals(self, other):
         return all([a == b for a, b in zip(self.state, other.state)])
 
-def bfs(maze, start_position, end_position, generate_children):
-    initial_node = Node(None, start_position)
-    end_node = Node(None, end_position)
+
+def bfs(map, start_position, goal_map, generate_children, heuristic):
+    initial_node = Node(None, start_position, map)
+    end_node = Node(None, None, goal_map)
+    end_node.h = end_node.g = end_node.f = 0
     closed_list = []
     opened_list = collections.deque([initial_node])
     closed_list.append(initial_node)
 
     while opened_list:
         current_node = opened_list.popleft()
-        if current_node.position == end_node.position:
+        if current_node.map_equals(end_node):
             return create_path(initial_node, current_node)
 
         # Llamar a generate children aca porque no los tenes de entrada...
-        for child in generate_children(current_node, maze):
+        for child in generate_children(current_node):
             if child not in closed_list:
                 closed_list.append(child)
                 opened_list.append(child)
 
 
-def dfs(maze, start_position, end_position, generate_children):
-    initial_node = Node(None, start_position)
-    end_node = Node(None, end_position)
+
+# BUG
+def dfs(map, start_position, goal_map, generate_children, heuristic):
+    initial_node = Node(None, start_position, map)
+    end_node = Node(None, None, goal_map)
+    end_node.h = end_node.g = end_node.f = 0
     closed_list = [initial_node]
     opened_list = collections.deque([initial_node])
 
     while opened_list:
         current_node = opened_list.pop()
-        if current_node.position == end_node.position:
+        if current_node.map_equals(end_node):
             return create_path(initial_node, current_node)
 
         # Llamar a generate children aca porque no los tenes de entrada...
-        for child in generate_children(current_node, maze):
+        for child in generate_children(current_node):
             if child not in closed_list:
                 closed_list.append(child)
                 opened_list.append(child)
@@ -132,7 +137,6 @@ def global_greedy(maze, start_position, end_position, generate_children, heurist
 # Generate children devuelve un array de hijos dado el nodo. (movimientos posibles desde un tablero)
 # Generate children devuelve un array de hijos dado el nodo. (movimientos posibles desde un tablero)
 def astar(map, start_position, goal_map, generate_children, heuristic):
-
     initial_node = Node(None, start_position, map)
     initial_node.h = heuristic(map, goal_map)
     initial_node.g = 0
@@ -146,26 +150,21 @@ def astar(map, start_position, goal_map, generate_children, heuristic):
 
     while opened_list:
 
-        current_node = min(opened_list, key=lambda x: x.f)
-        opened_list.remove(current_node)
-        closed_list.append(current_node)
-        print(current_node.position)
-        print(current_node.state)
-
-        # current_node = opened_list[0]
-        # current_index = 0
+        current_node = opened_list[0]
+        current_index = 0
         # Calculo el nodo de menor f. (f = g + h)
-        # for (i, node) in enumerate(opened_list):
-        #     if node.f == current_node.f and node.h < current_node.h:
-        #         current_node = node
-        #         current_index = i
-        #     elif node.f < current_node.f:
-        #         current_node = node
-        #         current_index = i
-        #
-        # opened_list.pop(current_index)
-        # closed_list.append(current_node)
+        for (i, node) in enumerate(opened_list):
+            if node.f == current_node.f and node.h < current_node.h:
+                current_node = node
+                current_index = i
+            elif node.f < current_node.f:
+                current_node = node
+                current_index = i
 
+        opened_list.pop(current_index)
+        closed_list.append(current_node)
+        print(current_node.state)
+        print("\n")
         if current_node.map_equals(end_node):
             return create_path(initial_node, current_node)
 
@@ -183,7 +182,7 @@ def astar(map, start_position, goal_map, generate_children, heuristic):
 
             is_open = False
             for openNode in opened_list:
-                if child.map_equals(openNode) and child.g > openNode.g:
+                if child == openNode and child.g > openNode.g:
                     is_open = True
 
             if is_open:
@@ -197,6 +196,7 @@ def euclidean_heuristic(position, end_position):
 
 def manhattan_distance(pos1, pos2):
     return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
+
 
 def sokoban_heuristic(state, goal_map):
     total_distance = 0
@@ -219,9 +219,12 @@ def sokoban_heuristic(state, goal_map):
 def generate_new_state(current_node, new_position):
     new_map = deepcopy(current_node.state)
     new_map[current_node.position[0]][current_node.position[1]] = EMPTY
+
     if new_map[current_node.position[0] + new_position[0]][current_node.position[1] + new_position[1]] == BOX:
-        new_box_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
-        new_map[new_box_position[0] + new_position[0]][new_box_position[1] + new_position[1]] = BOX
+        new_map[current_node.position[0] + new_position[0]][current_node.position[1] + new_position[1]] = EMPTY
+        new_box_position = (
+        current_node.position[0] + 2 * new_position[0], current_node.position[1] + 2 * new_position[1])
+        new_map[new_box_position[0]][new_box_position[1]] = BOX
     return new_map
 
 
@@ -282,6 +285,32 @@ def main():
         [' ', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ']
     ]
 
+    sokoban_easy_map = [
+        [' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', '#', '$', '#', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', ' '],
+        [' ', '#', '#', ' ', ' ', ' ', ' ', '$', ' ', ' ', ' ', ' ', '#', '#', ' '],
+        ['#', '#', ' ', ' ', '#', ' ', '#', ' ', '#', ' ', '#', ' ', ' ', '#', '#'],
+        ['#', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', '#'],
+        ['#', ' ', '#', '#', ' ', ' ', '#', ' ', '#', ' ', ' ', '#', '#', ' ', '#'],
+        ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
+        ['#', '#', '#', '#', ' ', ' ', '#', '#', '#', ' ', ' ', '#', '#', '#', '#'],
+        [' ', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ']
+    ]
+
+    sokoban_medium_map = [
+        [' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', ' '],
+        [' ', '#', '#', ' ', ' ', '$', ' ', ' ', ' ', '$', ' ', ' ', '#', '#', ' '],
+        ['#', '#', ' ', ' ', '#', ' ', '#', ' ', '#', ' ', '#', ' ', ' ', '#', '#'],
+        ['#', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', '#'],
+        ['#', ' ', '#', '#', ' ', ' ', '#', ' ', '#', ' ', ' ', '#', '#', ' ', '#'],
+        ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
+        ['#', '#', '#', '#', ' ', ' ', '#', '#', '#', ' ', ' ', '#', '#', '#', '#'],
+        [' ', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ']
+    ]
+
     sokoban_goal = [
         [' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' '],
         [' ', ' ', ' ', ' ', ' ', ' ', '#', '$', '#', ' ', ' ', ' ', ' ', ' ', ' '],
@@ -290,13 +319,13 @@ def main():
         ['#', '#', ' ', ' ', '#', ' ', '#', ' ', '#', ' ', '#', ' ', ' ', '#', '#'],
         ['#', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', '#'],
         ['#', ' ', '#', '#', ' ', ' ', '#', ' ', '#', ' ', ' ', '#', '#', ' ', '#'],
-        ['#', ' ', ' ', ' ', ' ', ' ', '.', ' ', '.', ' ', ' ', ' ', ' ', ' ', '#'],
+        ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
         ['#', '#', '#', '#', ' ', ' ', '#', '#', '#', ' ', ' ', '#', '#', '#', '#'],
         [' ', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ']
     ]
     start = (7, 7)
 
-    path = astar(sokoban_map, start, sokoban_goal, generate_children_maze, sokoban_heuristic)
+    path = astar(sokoban_medium_map, start, sokoban_goal, generate_children_maze, sokoban_heuristic)
     print(path)
 
 
