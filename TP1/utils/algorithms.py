@@ -47,7 +47,6 @@ def bfs(map, start_position, goal_map, generate_children, heuristic):
                 opened_list.append(child)
 
 
-
 # BUG
 def dfs(map, start_position, goal_map, generate_children, heuristic):
     initial_node = Node(None, start_position, map)
@@ -190,26 +189,34 @@ def astar(map, start_position, goal_map, generate_children, heuristic):
             opened_list.append(child)
 
 
-def euclidean_heuristic(position, end_position):
-    return ((position[0] - end_position[0]) ** 2) + ((position[1] - end_position[1]) ** 2)
+def euclidean_heuristic(state, goal_map):
+    total_distance = 0
+    for x_pos_state in range(len(state)):
+        for y_pos_state in range(len(state[0])):
+            if state[x_pos_state][y_pos_state] == BOX:
+                min_distance = float('inf')
+                for x_pos_goal in range(len(goal_map)):
+                    for y_pos_goal in range(len(goal_map[0])):
+                        if goal_map[x_pos_goal][y_pos_goal] == '$':
+                            distance = (x_pos_state - x_pos_goal) ** 2 + (y_pos_state - y_pos_goal) ** 2
+                            min_distance = min(min_distance, distance)
+                total_distance += min_distance
+
+    return total_distance
+    # return ((position[0] - end_position[0]) ** 2) + ((position[1] - end_position[1]) ** 2)
 
 
-def manhattan_distance(pos1, pos2):
-    return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
-
-
-def sokoban_heuristic(state, goal_map):
+def manhattan_heuristic(state, goal_map):
     total_distance = 0
 
-    for i in range(len(state)):
-        for j in range(len(state[0])):
-            if state[i][j] == BOX:
-                # Encontrar la distancia mínima de la caja al objetivo correspondiente
+    for x_pos_state in range(len(state)):
+        for y_pos_state in range(len(state[0])):
+            if state[x_pos_state][y_pos_state] == BOX:
                 min_distance = float('inf')
-                for k in range(len(goal_map)):
-                    for l in range(len(goal_map[0])):
-                        if goal_map[k][l] == '$':
-                            distance = abs(i - k) + abs(j - l)
+                for x_pos_goal in range(len(goal_map)):
+                    for y_pos_goal in range(len(goal_map[0])):
+                        if goal_map[x_pos_goal][y_pos_goal] == '$':
+                            distance = abs(x_pos_state - x_pos_goal) + abs(y_pos_state - y_pos_goal)
                             min_distance = min(min_distance, distance)
                 total_distance += min_distance
 
@@ -223,7 +230,7 @@ def generate_new_state(current_node, new_position):
     if new_map[current_node.position[0] + new_position[0]][current_node.position[1] + new_position[1]] == BOX:
         new_map[current_node.position[0] + new_position[0]][current_node.position[1] + new_position[1]] = EMPTY
         new_box_position = (
-        current_node.position[0] + 2 * new_position[0], current_node.position[1] + 2 * new_position[1])
+            current_node.position[0] + 2 * new_position[0], current_node.position[1] + 2 * new_position[1])
         new_map[new_box_position[0]][new_box_position[1]] = BOX
     return new_map
 
@@ -325,7 +332,7 @@ def main():
     ]
     start = (7, 7)
 
-    path = astar(sokoban_medium_map, start, sokoban_goal, generate_children_maze, sokoban_heuristic)
+    path = astar(sokoban_medium_map, start, sokoban_goal, generate_children_maze, manhattan_heuristic)
     print(path)
 
 
