@@ -220,7 +220,7 @@ def main():
     start = (7, 7)
 
     start_time = time.time()
-    path = astar(sokoban_easy_map, start, sokoban_goal, generate_children_sokoban, sokoban_heuristic)
+    path = astar(sokoban_easy_map, start, sokoban_goal, generate_children_sokoban, manhattan_heuristic)
     print("--- %s seconds ---" % (time.time() - start_time))
     print(path)
     print(len(path))

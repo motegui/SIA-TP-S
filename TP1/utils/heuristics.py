@@ -1,26 +1,41 @@
-from sokoban import *
+from random import random
+import random
+
+BOX = '$'
 
 
-def euclidean_heuristic(position, end_position):
-    return ((position[0] - end_position[0]) ** 2) + ((position[1] - end_position[1]) ** 2)
+def heuristic_non_admissible(state, goal_map):
+    # Retorna un valor aleatorio como heurística
+    return random.randint(0, 100)
 
 
-def manhattan_distance(pos1, pos2):
-    return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
-
-
-def sokoban_heuristic(state, goal_map):
+def manhattan_heuristic(state, goal_map):
     total_distance = 0
 
-    for i in range(len(state)):
-        for j in range(len(state[0])):
-            if state[i][j] == BOX:
-                # Encontrar la distancia mínima de la caja al objetivo correspondiente
+    for x_pos_state in range(len(state)):
+        for y_pos_state in range(len(state[0])):
+            if state[x_pos_state][y_pos_state] == BOX:
                 min_distance = float('inf')
-                for k in range(len(goal_map)):
-                    for l in range(len(goal_map[0])):
-                        if goal_map[k][l] == '$':
-                            distance = abs(i - k) + abs(j - l)
+                for x_pos_goal in range(len(goal_map)):
+                    for y_pos_goal in range(len(goal_map[0])):
+                        if goal_map[x_pos_goal][y_pos_goal] == BOX:
+                            distance = abs(x_pos_state - x_pos_goal) + abs(y_pos_state - y_pos_goal)
+                            min_distance = min(min_distance, distance)
+                total_distance += min_distance
+
+    return total_distance
+
+
+def euclidean_heuristic(state, goal_map):
+    total_distance = 0
+    for x_pos_state in range(len(state)):
+        for y_pos_state in range(len(state[0])):
+            if state[x_pos_state][y_pos_state] == BOX:
+                min_distance = float('inf')
+                for x_pos_goal in range(len(goal_map)):
+                    for y_pos_goal in range(len(goal_map[0])):
+                        if goal_map[x_pos_goal][y_pos_goal] == BOX:
+                            distance = (x_pos_state - x_pos_goal) ** 2 + (y_pos_state - y_pos_goal) ** 2
                             min_distance = min(min_distance, distance)
                 total_distance += min_distance
 
