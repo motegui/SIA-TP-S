@@ -4,9 +4,41 @@ import random
 BOX = '$'
 
 
+#todo: decidir si dejarla o no (es demasiado trivial)
 def heuristic_non_admissible(state, goal_map):
     # Retorna un valor aleatorio como heurística
     return random.randint(0, 100)
+
+#Heuristica NO ADMISIBLE -> en casos sobreestima
+#Idea: heuristica que considera la distancia del jugador a la caja mas cercana, la distancia de esa caja a el goal mas cercano,
+#luego la distancia de ese goal a la caja mas cercana, despues la distancia de esta nueva caja a otro goal mas cercano, etc
+#La idea es simular el recorrido del jugador
+#todo: cambiarle el nombre xd
+def player_movements_heuristic(state, goal_map, player_pos):
+    total_distance = 0
+    box_counter = 0
+    last_goal = None
+    for x_pos_state in range(len(state)):
+        for y_pos_state in range(len(state[0])):
+            if state[x_pos_state][y_pos_state] == BOX:
+                box_counter += 1
+                min_distance = float('inf')
+                for x_pos_goal in range(len(goal_map)):
+                    for y_pos_goal in range(len(goal_map[0])):
+                        if goal_map[x_pos_goal][y_pos_goal] == BOX:
+                            distance = manhattan_distance(x_pos_state, y_pos_state, x_pos_goal, y_pos_goal)
+                            # queremos considerar solamente el goal que esta más cerca
+                            min_distance = min(min_distance, distance)
+                            last_goal = [x_pos_goal, y_pos_goal]
+                total_distance += min_distance
+                #si es la primer caja sumamos la distancia del jugador a la caja
+                #si no, hay que considerar la distancia del ultimo goal (donde "se quedo" el jugador) a la caja actual
+                if box_counter == 1:
+                    total_distance += manhattan_distance(x_pos_state, y_pos_state, player_pos[0], player_pos[1])
+                else:
+                    total_distance += manhattan_distance(x_pos_state, y_pos_state, last_goal[0], last_goal[1])
+
+    return total_distance
 
 
 def manhattan_distance(first_x_pos, first_y_post, second_x_pos, second_y_pos):
