@@ -2,7 +2,7 @@ import collections
 import time
 from copy import deepcopy
 from heuristics import *
-from sokoban import *
+from algorithms_utils import *
 from node import Node
 
 
@@ -46,7 +46,7 @@ def local_greedy(initial_map, start_position, goal_map, generate_children, heuri
     closed_list = []
 
     initial_node = Node(None, start_position, initial_map)
-    initial_node.h = heuristic(initial_map, goal_map)
+    initial_node.h = heuristic(initial_map, goal_map, start_position)
     initial_node.g = 0
     initial_node.f = initial_node.h
 
@@ -66,7 +66,7 @@ def local_greedy(initial_map, start_position, goal_map, generate_children, heuri
         # Children are created dynamically
         for child in ordered_children:
             child.g = current_node.g + 1  # distancia hasta aca + distancia de ir de current a child
-            child.h = heuristic(child.state, goal_map)
+            child.h = heuristic(child.state, goal_map, child.position)
             child.f = child.g + child.h
 
             if child not in closed_list:
@@ -78,7 +78,7 @@ def global_greedy(initial_map, start_position, goal_map, generate_children, heur
     closed_list = []
 
     initial_node = Node(None, start_position, initial_map)
-    initial_node.h = heuristic(initial_map, goal_map)
+    initial_node.h = heuristic(initial_map, goal_map, start_position)
     initial_node.g = 0
     initial_node.f = initial_node.h
 
@@ -98,7 +98,7 @@ def global_greedy(initial_map, start_position, goal_map, generate_children, heur
         # Children are created dynamically
         for child in children:
             child.g = current_node.g + 1
-            child.h = heuristic(child.state, goal_map)
+            child.h = heuristic(child.state, goal_map, child.position)
             child.f = child.g + child.h
 
             if child not in closed_list:
@@ -110,7 +110,7 @@ def global_greedy(initial_map, start_position, goal_map, generate_children, heur
 
 def astar(initial_map, start_position, goal_map, generate_children, heuristic):
     initial_node = Node(None, start_position, initial_map)
-    initial_node.h = heuristic(initial_map, goal_map)
+    initial_node.h = heuristic(initial_map, goal_map, start_position)
     initial_node.g = 0
     initial_node.f = initial_node.h
 
@@ -145,7 +145,7 @@ def astar(initial_map, start_position, goal_map, generate_children, heuristic):
                 continue
 
             child.g = current_node.g + 1
-            child.h = heuristic(child.state, goal_map)
+            child.h = heuristic(child.state, goal_map, child.position)
             child.f = child.g + child.h
 
             is_open = False
