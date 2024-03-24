@@ -4,9 +4,11 @@ from copy import deepcopy
 from heuristics import *
 from algorithms_utils import *
 from node import Node
+from process_map import *
 
 
 def bfs(initial_map, start_position, goal_map, generate_children):
+    expanded_nodes = 0
     initial_node = Node(None, start_position, initial_map)
     end_node = Node(None, None, goal_map)
     closed_list = [initial_node]
@@ -15,16 +17,18 @@ def bfs(initial_map, start_position, goal_map, generate_children):
     while opened_list:
         current_node = opened_list.popleft()  # Remove and return the leftmost element.
         if current_node.state_equals(end_node):
-            return create_path(current_node)
+            return create_response(current_node, expanded_nodes, len(opened_list))
 
         # Children are created dynamically
         for child in generate_children(current_node, goal_map):
+            expanded_nodes += 1
             if child not in closed_list:
                 closed_list.append(child)
                 opened_list.append(child)
 
 
 def dfs(initial_map, start_position, goal_map, generate_children):
+    expanded_nodes = 0
     initial_node = Node(None, start_position, initial_map)
     end_node = Node(None, None, goal_map)
     closed_list = [initial_node]
@@ -33,8 +37,9 @@ def dfs(initial_map, start_position, goal_map, generate_children):
     while opened_list:
         current_node = opened_list.pop()  # Remove and return the rightmost element.
         if current_node.state_equals(end_node):
-            return create_path(current_node)
+            return create_response(current_node, expanded_nodes, len(opened_list))
 
+        expanded_nodes += 1
         # Children are created dynamically
         for child in generate_children(current_node, goal_map):
             if child not in closed_list:
@@ -43,6 +48,7 @@ def dfs(initial_map, start_position, goal_map, generate_children):
 
 
 def local_greedy(initial_map, start_position, goal_map, generate_children, heuristic):
+    expanded_nodes = 0
     closed_list = []
 
     initial_node = Node(None, start_position, initial_map)
@@ -60,9 +66,10 @@ def local_greedy(initial_map, start_position, goal_map, generate_children, heuri
         current_node = opened_list.pop()
 
         if current_node.state_equals(end_node):
-            return create_path(current_node)
+            return create_response(current_node, expanded_nodes, len(opened_list))
 
         ordered_children = sorted(generate_children(current_node, goal_map), key=lambda x: x.h, reverse=True)
+        expanded_nodes += 1
         # Children are created dynamically
         for child in ordered_children:
             child.g = current_node.g + 1  # distancia hasta aca + distancia de ir de current a child
@@ -75,6 +82,7 @@ def local_greedy(initial_map, start_position, goal_map, generate_children, heuri
 
 
 def global_greedy(initial_map, start_position, goal_map, generate_children, heuristic):
+    expanded_nodes = 0
     closed_list = []
 
     initial_node = Node(None, start_position, initial_map)
@@ -92,9 +100,10 @@ def global_greedy(initial_map, start_position, goal_map, generate_children, heur
         current_node = opened_list.pop()
 
         if current_node.state_equals(end_node):
-            return create_path(current_node)
+            return create_response(current_node, expanded_nodes, len(opened_list))
 
         children = generate_children(current_node, goal_map)
+        expanded_nodes += 1
         # Children are created dynamically
         for child in children:
             child.g = current_node.g + 1
@@ -109,6 +118,7 @@ def global_greedy(initial_map, start_position, goal_map, generate_children, heur
 
 
 def astar(initial_map, start_position, goal_map, generate_children, heuristic):
+    expanded_nodes = 0
     initial_node = Node(None, start_position, initial_map)
     initial_node.h = heuristic(initial_map, goal_map, start_position)
     initial_node.g = 0
@@ -135,10 +145,11 @@ def astar(initial_map, start_position, goal_map, generate_children, heuristic):
         opened_list.pop(current_index)
         closed_list.append(current_node)
         if current_node.state_equals(end_node):
-            return create_path(current_node)
+            return create_response(current_node, expanded_nodes, len(opened_list))
 
         # Children are created dynamically
         children = generate_children(current_node, goal_map)
+        expanded_nodes += 1
 
         for child in children:
             if child in closed_list:
@@ -157,77 +168,32 @@ def astar(initial_map, start_position, goal_map, generate_children, heuristic):
             opened_list.append(child)
 
 
-def create_path(current_node):
+def create_response(current_node, expanded_nodes, opened_list_size):
     path = [current_node.position]
     while current_node.parent is not None:
         current_node = current_node.parent
         path.append(current_node.position)
-    return path[::-1]  # Doy vuelta asi arranca por el nodo inicial.
+    path = path[::-1]
+    if path is None:
+        return ["failure", None, expanded_nodes, opened_list_size, None]
+    return ["Success", len(path), expanded_nodes, opened_list_size, path]
 
 
 def main():
-    sokoban_map = [
-        [' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', ' '],
-        [' ', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' '],
-        ['#', '#', ' ', ' ', '#', ' ', '#', ' ', '#', ' ', '#', ' ', ' ', '#', '#'],
-        ['#', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', '#'],
-        ['#', ' ', '#', '#', ' ', ' ', '#', ' ', '#', ' ', ' ', '#', '#', ' ', '#'],
-        ['#', ' ', ' ', ' ', ' ', ' ', '$', ' ', '$', ' ', ' ', ' ', ' ', ' ', '#'],
-        ['#', '#', '#', '#', ' ', ' ', '#', '#', '#', ' ', ' ', '#', '#', '#', '#'],
-        [' ', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ']
-    ]
-
-    sokoban_easy_map = [
-        [' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', ' '],
-        [' ', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' '],
-        ['#', '#', ' ', ' ', '#', ' ', '#', ' ', '#', ' ', '#', ' ', ' ', '#', '#'],
-        ['#', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', '#'],
-        ['#', ' ', '#', '#', ' ', ' ', '#', ' ', '#', ' ', ' ', '#', '#', ' ', '#'],
-        ['#', ' ', ' ', ' ', ' ', '$', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
-        ['#', '#', '#', '#', ' ', ' ', '#', '#', '#', ' ', ' ', '#', '#', '#', '#'],
-        [' ', ' ', ' ', '#', '#', '#', '#', '$', '#', '#', '#', '#', ' ', ' ', ' ']
-    ]
-
-    sokoban_medium_map = [
-        [' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', ' '],
-        [' ', '#', '#', ' ', ' ', '$', ' ', ' ', ' ', '$', ' ', ' ', '#', '#', ' '],
-        ['#', '#', ' ', ' ', '#', ' ', '#', ' ', '#', ' ', '#', ' ', ' ', '#', '#'],
-        ['#', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', '#'],
-        ['#', ' ', '#', '#', ' ', ' ', '#', ' ', '#', ' ', ' ', '#', '#', ' ', '#'],
-        ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
-        ['#', '#', '#', '#', ' ', ' ', '#', '#', '#', ' ', ' ', '#', '#', '#', '#'],
-        [' ', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ']
-    ]
-
-    sokoban_goal = [
-        [' ', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', '#', '$', '#', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', '#', '#', '#', '#', '#', '$', '#', '#', '#', '#', '#', ' ', ' '],
-        [' ', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', '#', ' '],
-        ['#', '#', ' ', ' ', '#', ' ', '#', ' ', '#', ' ', '#', ' ', ' ', '#', '#'],
-        ['#', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', ' ', ' ', '#'],
-        ['#', ' ', '#', '#', ' ', ' ', '#', ' ', '#', ' ', ' ', '#', '#', ' ', '#'],
-        ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
-        ['#', '#', '#', '#', ' ', ' ', '#', '#', '#', ' ', ' ', '#', '#', '#', '#'],
-        [' ', ' ', ' ', '#', '#', '#', '#', ' ', '#', '#', '#', '#', ' ', ' ', ' ']
-    ]
-    start = (7, 7)
-
-    start_time = time.time()
-    path = astar(sokoban_easy_map, start, sokoban_goal, generate_children_sokoban, manhattan_heuristic)
-    print("--- %s seconds ---" % (time.time() - start_time))
-    print(path)
-    print(len(path))
+    responses = []
+    for i in range(4, 7):
+        start_time = time.time()
+        m1, m2, start = process_map(read_file("../Levels/level" + str(i) + ".txt"))
+        print("entrando al level: ", i)
+        print(m1, m2, start)
+        response = global_greedy(m1, start, m2, generate_children_sokoban, manhattan_heuristic)
+        response.append((time.time() - start_time))
+        responses.append(response)
+    return responses
 
 
 # [(0, 0), (1, 1), (2, 2), (3, 3), (4, 3), (5, 3), (6, 4), (7, 5), (7, 6)]
 # [(0, 0), (1, 1), (2, 2), (3, 3), (4, 3), (5, 3), (6, 4), (7, 5), (7, 6)]
 
 if __name__ == '__main__':
-    main()
+    print(main())

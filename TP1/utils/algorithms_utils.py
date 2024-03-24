@@ -2,13 +2,13 @@ from copy import deepcopy
 
 from node import Node
 
-WALL = '#'
-BOX = '$'
-EMPTY = ' '
+WALL = 35
+BOX = 36
+EMPTY = 32
 
 
 def IS_SOLID(x):
-    return x == '#' or x == '$'
+    return x == WALL or x == BOX
 
 
 def IS_VERTEX(new_box_position, current_node):
