@@ -1,4 +1,5 @@
 import collections
+import heapq
 import time
 from copy import deepcopy
 from heuristics import *
@@ -20,7 +21,7 @@ def bfs(state, start_position, generate_children):
             return create_response(current_node, expanded_nodes, len(opened_list))
 
         # Children are created dynamically
-        for child in generate_children(current_node, None):
+        for child in generate_children(current_node):
             expanded_nodes += 1
             if child not in closed_list:
                 closed_list.append(child)
@@ -41,7 +42,7 @@ def dfs(state, start_position, generate_children):
 
         expanded_nodes += 1
         # Children are created dynamically
-        for child in generate_children(current_node, None):
+        for child in generate_children(current_node):
             if child not in closed_list:
                 closed_list.append(child)
                 opened_list.append(child)
@@ -64,13 +65,13 @@ def local_greedy(state, start_position, generate_children, heuristic):
         if current_node.state.is_final():
             return create_response(current_node, expanded_nodes, len(opened_list))
 
-        ordered_children = sorted(generate_children(current_node, heuristic), key=lambda x: x.h, reverse=True)
+        ordered_children = sorted(generate_children(current_node), key=lambda x: heuristic(x), reverse=True)
         expanded_nodes += 1
         # Children are created dynamically
         for child in ordered_children:
-            # child.g = current_node.g + 1  # distancia hasta aca + distancia de ir de current a child
-            # child.h = heuristic(child)
-            # child.f = child.g + child.h
+            child.g = current_node.g + 1  # distancia hasta aca + distancia de ir de current a child
+            child.h = heuristic(child)
+            child.f = child.g + child.h
 
             if child not in closed_list:
                 closed_list.append(child)
@@ -95,13 +96,13 @@ def global_greedy(state, start_position, generate_children, heuristic):
         if current_node.state.is_final():
             return create_response(current_node, expanded_nodes, len(opened_list))
 
-        children = generate_children(current_node, heuristic)
+        children = generate_children(current_node)
         expanded_nodes += 1
         # Children are created dynamically
         for child in children:
-            # child.g = current_node.g + 1
-            # child.h = heuristic(child)
-            # child.f = child.g + child.h
+            child.g = current_node.g + 1
+            child.h = heuristic(child)
+            child.f = child.g + child.h
 
             if child not in closed_list:
                 closed_list.append(child)
@@ -119,44 +120,36 @@ def astar(state, start_position, generate_children, heuristic):
     initial_node.f = initial_node.h
 
     opened_list = [initial_node]
-    closed_list = []
+    closed_set = set()
 
     while opened_list:
+        #heapq.heappop y heap1.heappush garantiza que los nodos se mantengan en orden según su valor de f
+        current_node = heapq.heappop(opened_list)
+        closed_set.add(current_node)
 
-        current_node = opened_list[0]
-        current_index = 0
-        for (i, node) in enumerate(opened_list):
-            if node.f == current_node.f and node.h < current_node.h:
-                current_node = node
-                current_index = i
-            elif node.f < current_node.f:
-                current_node = node
-                current_index = i
-
-        opened_list.pop(current_index)
-        closed_list.append(current_node)
         if current_node.state.is_final():
             return create_response(current_node, expanded_nodes, len(opened_list))
 
         # Children are created dynamically
-        children = generate_children(current_node, heuristic)
+        children = generate_children(current_node)
         expanded_nodes += 1
 
         for child in children:
-            if child in closed_list:
+            if child in closed_set:
                 continue
 
-            # child.g = current_node.g + 1
-            # child.h = heuristic(child)
-            # child.f = child.g + child.h
+            child.g = current_node.g + 1
+            child.h = heuristic(child)
+            child.f = child.g + child.h
 
-            is_open = False
-            for openNode in opened_list:
-                if child == openNode and child.g > openNode.g:
-                    is_open = True
-            if is_open:
+            existing_node = next((n for n in opened_list if n == child), None)
+            if existing_node and child.g >= existing_node.g:
                 continue
-            opened_list.append(child)
+
+            if existing_node:
+                opened_list.remove(existing_node)
+                heapq.heapify(opened_list)
+            heapq.heappush(opened_list, child)
 
 
 def create_response(current_node, expanded_nodes, opened_list_size):
@@ -172,12 +165,12 @@ def create_response(current_node, expanded_nodes, opened_list_size):
 
 def main():
     responses = []
-    for i in range(6, 7):
+    for i in range(1, 7):
         start_time = time.time()
         state, end_state, start = process_map(read_file("../Levels/level" + str(i) + ".txt"))
         print("entrando al level: ", i)
         print(state.current_map, start)
-        response = global_greedy(state, start, generate_children_sokoban, manhattan_heuristic)
+        response = dfs(state, start, generate_children_sokoban)
         responses.append((time.time() - start_time))
         responses.append(response)
     return responses

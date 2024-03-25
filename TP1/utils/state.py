@@ -14,5 +14,12 @@ class State:
         return len(used_goals) == len(self.goals)
 
     def __eq__(self, other):
-        return (all([a == b for a, b in zip(self.current_map, other.current_map)]) and self.goals == other.goals and
+        if not isinstance(other, State):
+            return False
+
+        return (self.current_map == other.current_map and
+                self.goals == other.goals and
                 self.boxes == other.boxes)
+
+    def __hash__(self):
+        return hash((tuple(map(tuple, self.current_map)), tuple(self.goals), tuple(self.boxes)))

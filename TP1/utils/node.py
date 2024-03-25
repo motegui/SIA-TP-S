@@ -11,6 +11,12 @@ class Node:
     def __eq__(self, other):
         return self.state == other.state and self.position == other.position
 
+    def __hash__(self):
+        return hash((self.parent, self.position, self.state))
+
+    def __lt__(self, other):
+        return self.f < other.f
+
     def state_equals(self, other):
         return all([a == b for a, b in zip(self.state, other.state)])
 
