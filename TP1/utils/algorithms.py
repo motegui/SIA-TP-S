@@ -7,91 +7,84 @@ from node import Node
 from process_map import *
 
 
-def bfs(initial_map, start_position, goal_map, generate_children):
+def bfs(state, start_position, generate_children):
     expanded_nodes = 0
-    initial_node = Node(None, start_position, initial_map)
-    end_node = Node(None, None, goal_map)
+    initial_node = Node(None, start_position, state)
+
     closed_list = [initial_node]
     opened_list = collections.deque([initial_node])
 
     while opened_list:
         current_node = opened_list.popleft()  # Remove and return the leftmost element.
-        if current_node.state_equals(end_node):
+        if current_node.state.is_final():
             return create_response(current_node, expanded_nodes, len(opened_list))
 
         # Children are created dynamically
-        for child in generate_children(current_node, goal_map):
+        for child in generate_children(current_node, None):
             expanded_nodes += 1
             if child not in closed_list:
                 closed_list.append(child)
                 opened_list.append(child)
 
 
-def dfs(initial_map, start_position, goal_map, generate_children):
+def dfs(state, start_position, generate_children):
     expanded_nodes = 0
-    initial_node = Node(None, start_position, initial_map)
-    end_node = Node(None, None, goal_map)
+    initial_node = Node(None, start_position, state)
+
     closed_list = [initial_node]
     opened_list = collections.deque([initial_node])
 
     while opened_list:
         current_node = opened_list.pop()  # Remove and return the rightmost element.
-        if current_node.state_equals(end_node):
+        if current_node.state.is_final():
             return create_response(current_node, expanded_nodes, len(opened_list))
 
         expanded_nodes += 1
         # Children are created dynamically
-        for child in generate_children(current_node, goal_map):
+        for child in generate_children(current_node, None):
             if child not in closed_list:
                 closed_list.append(child)
                 opened_list.append(child)
 
 
-def local_greedy(initial_map, start_position, goal_map, generate_children, heuristic):
+def local_greedy(state, start_position, generate_children, heuristic):
     expanded_nodes = 0
     closed_list = []
 
-    initial_node = Node(None, start_position, initial_map)
-    initial_node.h = heuristic(initial_map, goal_map, start_position)
+    initial_node = Node(None, start_position, state)
+    initial_node.h = heuristic(initial_node)
     initial_node.g = 0
     initial_node.f = initial_node.h
-
-    end_node = Node(None, None, goal_map)
-    end_node.h = end_node.g = end_node.f = 0
 
     opened_list = collections.deque([initial_node])
     closed_list.append(initial_node)
 
     while opened_list:
         current_node = opened_list.pop()
-
-        if current_node.state_equals(end_node):
+        if current_node.state.is_final():
             return create_response(current_node, expanded_nodes, len(opened_list))
 
-        ordered_children = sorted(generate_children(current_node, goal_map), key=lambda x: x.h, reverse=True)
+        ordered_children = sorted(generate_children(current_node, heuristic), key=lambda x: x.h, reverse=True)
         expanded_nodes += 1
         # Children are created dynamically
         for child in ordered_children:
-            child.g = current_node.g + 1  # distancia hasta aca + distancia de ir de current a child
-            child.h = heuristic(child.state, goal_map, child.position)
-            child.f = child.g + child.h
+            # child.g = current_node.g + 1  # distancia hasta aca + distancia de ir de current a child
+            # child.h = heuristic(child)
+            # child.f = child.g + child.h
 
             if child not in closed_list:
                 closed_list.append(child)
                 opened_list.append(child)
 
 
-def global_greedy(initial_map, start_position, goal_map, generate_children, heuristic):
+def global_greedy(state, start_position, generate_children, heuristic):
     expanded_nodes = 0
     closed_list = []
 
-    initial_node = Node(None, start_position, initial_map)
-    initial_node.h = heuristic(initial_map, goal_map, start_position)
+    initial_node = Node(None, start_position, state)
+    initial_node.h = heuristic(initial_node)
     initial_node.g = 0
     initial_node.f = initial_node.h
-
-    end_node = Node(None, None, goal_map)
-    end_node.h = end_node.g = end_node.f = 0
 
     opened_list = collections.deque([initial_node])
     closed_list.append(initial_node)
@@ -99,16 +92,16 @@ def global_greedy(initial_map, start_position, goal_map, generate_children, heur
     while opened_list:
         current_node = opened_list.pop()
 
-        if current_node.state_equals(end_node):
+        if current_node.state.is_final():
             return create_response(current_node, expanded_nodes, len(opened_list))
 
-        children = generate_children(current_node, goal_map)
+        children = generate_children(current_node, heuristic)
         expanded_nodes += 1
         # Children are created dynamically
         for child in children:
-            child.g = current_node.g + 1
-            child.h = heuristic(child.state, goal_map, child.position)
-            child.f = child.g + child.h
+            # child.g = current_node.g + 1
+            # child.h = heuristic(child)
+            # child.f = child.g + child.h
 
             if child not in closed_list:
                 closed_list.append(child)
@@ -117,15 +110,13 @@ def global_greedy(initial_map, start_position, goal_map, generate_children, heur
         opened_list = collections.deque(sorted(opened_list, key=lambda x: x.h, reverse=True))
 
 
-def astar(initial_map, start_position, goal_map, generate_children, heuristic):
+def astar(state, start_position, generate_children, heuristic):
     expanded_nodes = 0
-    initial_node = Node(None, start_position, initial_map)
-    initial_node.h = heuristic(initial_map, goal_map, start_position)
+
+    initial_node = Node(None, start_position, state)
+    initial_node.h = heuristic(initial_node)
     initial_node.g = 0
     initial_node.f = initial_node.h
-
-    end_node = Node(None, None, goal_map)
-    end_node.h = end_node.g = end_node.f = 0
 
     opened_list = [initial_node]
     closed_list = []
@@ -144,20 +135,20 @@ def astar(initial_map, start_position, goal_map, generate_children, heuristic):
 
         opened_list.pop(current_index)
         closed_list.append(current_node)
-        if current_node.state_equals(end_node):
+        if current_node.state.is_final():
             return create_response(current_node, expanded_nodes, len(opened_list))
 
         # Children are created dynamically
-        children = generate_children(current_node, goal_map)
+        children = generate_children(current_node, heuristic)
         expanded_nodes += 1
 
         for child in children:
             if child in closed_list:
                 continue
 
-            child.g = current_node.g + 1
-            child.h = heuristic(child.state, goal_map, child.position)
-            child.f = child.g + child.h
+            # child.g = current_node.g + 1
+            # child.h = heuristic(child)
+            # child.f = child.g + child.h
 
             is_open = False
             for openNode in opened_list:
@@ -181,19 +172,17 @@ def create_response(current_node, expanded_nodes, opened_list_size):
 
 def main():
     responses = []
-    for i in range(4, 7):
+    for i in range(6, 7):
         start_time = time.time()
-        m1, m2, start = process_map(read_file("../Levels/level" + str(i) + ".txt"))
+        state, end_state, start = process_map(read_file("../Levels/level" + str(i) + ".txt"))
         print("entrando al level: ", i)
-        print(m1, m2, start)
-        response = global_greedy(m1, start, m2, generate_children_sokoban, manhattan_heuristic)
-        response.append((time.time() - start_time))
+        print(state.current_map, start)
+        response = global_greedy(state, start, generate_children_sokoban, manhattan_heuristic)
+        responses.append((time.time() - start_time))
         responses.append(response)
     return responses
 
 
-# [(0, 0), (1, 1), (2, 2), (3, 3), (4, 3), (5, 3), (6, 4), (7, 5), (7, 6)]
-# [(0, 0), (1, 1), (2, 2), (3, 3), (4, 3), (5, 3), (6, 4), (7, 5), (7, 6)]
 
 if __name__ == '__main__':
     print(main())
