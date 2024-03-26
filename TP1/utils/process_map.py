@@ -2,9 +2,17 @@ from TP1.utils.state import State
 
 
 def read_file(file_name):
-    with open(file_name, 'r') as file:
-        lines = file.readlines()
-    return [line.removesuffix('\n') for line in lines]
+    with open(file_name, "r") as file:
+        lines = file.read().split('\n')
+    #search for the max length in lines
+    length = max(len(line) for line in lines)
+    matrix = []
+    for line in lines:
+        padded_line = line.ljust(length, '#')
+        row = list(padded_line)
+        matrix.append(row)
+
+    return matrix
 
 
 def process_map(map):
@@ -43,28 +51,3 @@ def process_map(map):
     end_state = State(matrix_2, goal_positions, goal_positions)
     return state, end_state, start_position
 
-
-# def imprimir_mapa():
-#     # Nombre del archivo de texto
-#     nombre_archivo = "mapa.txt"
-#
-#     # Leer el archivo
-#     mapa = leer_archivo(nombre_archivo)
-#
-#     # Procesar el mapa
-#     matriz_1, matriz_2, posicion_arroba = procesar_mapa(mapa)
-#     print("Matriz 1:")
-#     for fila in matriz_1:
-#         fila_caracteres = [chr(numero) for numero in fila]
-#         print(' '.join(fila_caracteres))
-#
-#     print("Matriz 2:")
-#     for fila in matriz_2:
-#         fila_caracteres = [chr(numero) for numero in fila]
-#         print(' '.join(fila_caracteres))
-#
-#     print(posicion_arroba)
-#
-#
-# if __name__ == '__main__':
-#     imprimir_mapa()

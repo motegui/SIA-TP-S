@@ -15,6 +15,8 @@ class Node:
         return hash((self.parent, self.position, self.state))
 
     def __lt__(self, other):
+        if self.f == other.f:
+            return self.h < other.h
         return self.f < other.f
 
     def state_equals(self, other):

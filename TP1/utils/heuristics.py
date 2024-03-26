@@ -59,13 +59,11 @@ def manhattan_heuristic(current_node):
                 if goal not in current_node.state.boxes:
                     box_goal_distance = manhattan_distance(box, goal)
                     min_box_goal_distance = min(min_box_goal_distance, box_goal_distance)
-            # if min_box_goal_distance < min_boxes_distance:
-            #     closest_box_to_goal = box
-            #     min_boxes_distance = min_box_goal_distance
+
             total_distance += min_box_goal_distance
     #probando de sumar la distancia del jugador a la caja que esta mas cerca de un goal
-    if total_distance != 0:
-        total_distance += min_box_player_distance #si sumamos esto tarda mas todo
+    # if total_distance != 0:
+    #     total_distance += min_box_player_distance
     return total_distance
 
 

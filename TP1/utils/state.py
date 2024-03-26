@@ -17,7 +17,7 @@ class State:
         if not isinstance(other, State):
             return False
 
-        return (self.current_map == other.current_map and
+        return (
                 self.goals == other.goals and
                 self.boxes == other.boxes)
 

@@ -120,12 +120,11 @@ def astar(state, start_position, generate_children, heuristic):
     initial_node.f = initial_node.h
 
     opened_list = [initial_node]
-    closed_set = set()
+    closed_list = []
 
     while opened_list:
-        #heapq.heappop y heap1.heappush garantiza que los nodos se mantengan en orden según su valor de f
-        current_node = heapq.heappop(opened_list)
-        closed_set.add(current_node)
+
+        current_node = opened_list.pop()
 
         if current_node.state.is_final():
             return create_response(current_node, expanded_nodes, len(opened_list))
@@ -135,21 +134,30 @@ def astar(state, start_position, generate_children, heuristic):
         expanded_nodes += 1
 
         for child in children:
-            if child in closed_set:
+            if child in closed_list:
                 continue
 
             child.g = current_node.g + 1
             child.h = heuristic(child)
             child.f = child.g + child.h
 
-            existing_node = next((n for n in opened_list if n == child), None)
-            if existing_node and child.g >= existing_node.g:
+            is_open = False
+            is_contained = False
+            for openNode in opened_list:
+                if child == openNode:
+                    is_contained = True
+                    if child.g > openNode.g:
+                        is_open = True
+                        continue
+            if is_open:
                 continue
+            if is_contained:
+                opened_list.remove(child)
+            opened_list.append(child)
+            closed_list.append(current_node)
 
-            if existing_node:
-                opened_list.remove(existing_node)
-                heapq.heapify(opened_list)
-            heapq.heappush(opened_list, child)
+        opened_list = collections.deque(sorted(opened_list, key=lambda x: (x.f, x.h), reverse=True))
+
 
 
 def create_response(current_node, expanded_nodes, opened_list_size):
@@ -165,12 +173,12 @@ def create_response(current_node, expanded_nodes, opened_list_size):
 
 def main():
     responses = []
-    for i in range(1, 7):
+    for i in range(6, 7):
         start_time = time.time()
         state, end_state, start = process_map(read_file("../Levels/level" + str(i) + ".txt"))
         print("entrando al level: ", i)
-        print(state.current_map, start)
-        response = dfs(state, start, generate_children_sokoban)
+        # print(state.current_map, start)
+        response = astar(state, start, generate_children_sokoban, manhattan_heuristic)
         responses.append((time.time() - start_time))
         responses.append(response)
     return responses

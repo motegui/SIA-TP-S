@@ -44,17 +44,20 @@ def generate_children_sokoban(current_node):
             # Calcular la nueva posición de la caja después del movimiento
             new_box_position = (node_position[0] + new_position[0], node_position[1] + new_position[1])
 
+            if IS_WRONG_VERTEX(node_position, current_node):
+                continue
+
             # Verificar si la nueva posición de la caja está dentro de los límites del mapa y está vacía
             if (0 <= new_box_position[0] < len(current_node.state.current_map) and 0 <= new_box_position[1] < len(
                     current_node.state.current_map[0]) and
                     current_node.state.current_map[new_box_position[0]][new_box_position[1]] == EMPTY):
-                new_state = generate_new_state(current_node, new_position)
+                new_state = generate_new_state(current_node, node_position)
                 new_node = Node(current_node, node_position, new_state)
 
                 children.append(new_node)
         else:
             # Si la posición no contiene una caja, generar un nuevo estado sin mover la caja
-            new_state = generate_new_state(current_node, new_position)
+            new_state = generate_new_state(current_node, node_position)
             new_node = Node(current_node, node_position, new_state)
 
             children.append(new_node)
