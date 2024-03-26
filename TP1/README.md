@@ -50,3 +50,5 @@ Hay 4 tipos de heurísticas:
 - RANDOM
 
 **En caso de usar un algoritmo no informado (BFS o DFS) se debe especificar NONE en la heurística**
+
+Corriendo el proyecto TP1.ipynb se podrán ver todos los gráficos realizados.
