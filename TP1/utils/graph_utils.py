@@ -40,6 +40,4 @@ def average_and_variance_graph(means, variances, labels, title, yLabel):
     ax.set_title(title)
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
-    ax.legend()
-
     plt.show()
