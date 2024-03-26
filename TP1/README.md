@@ -10,8 +10,8 @@ En este trabajo se implementó una versión simple del juego Sokoban utilizando 
 
 A su vez, se implementaron 3 heurísticas utilizadas en los métodos de búsqueda informados:
 - Player movements (no admisible)
-- Manhattan (admisible)
-- Euclidean (admisible)
+- Manhattan entre boxes y goals (admisible)
+- Euclidean entre boxes y goals (admisible)
 
 Se encuentran distintos "levels" para probar diferentes mapas y dificultades del juego
 

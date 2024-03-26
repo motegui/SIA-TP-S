@@ -30,24 +30,19 @@ def generate_children_sokoban(current_node):
     for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
         node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
 
-        # Verificar si la posición está dentro de los límites del mapa
         if not (0 <= node_position[0] < len(current_node.state.current_map) and 0 <= node_position[1] < len(
                 current_node.state.current_map[0])):
             continue
 
-        # Verificar si la posición contiene una pared
         if current_node.state.current_map[node_position[0]][node_position[1]] == WALL:
             continue
 
-        # Si la posición contiene una caja, verificar si se puede mover la caja
         if node_position in current_node.state.boxes:
-            # Calcular la nueva posición de la caja después del movimiento
             new_box_position = (node_position[0] + new_position[0], node_position[1] + new_position[1])
 
             if IS_WRONG_VERTEX(node_position, current_node):
                 continue
 
-            # Verificar si la nueva posición de la caja está dentro de los límites del mapa y está vacía
             if (0 <= new_box_position[0] < len(current_node.state.current_map) and 0 <= new_box_position[1] < len(
                     current_node.state.current_map[0]) and
                     current_node.state.current_map[new_box_position[0]][new_box_position[1]] == EMPTY):
@@ -56,7 +51,6 @@ def generate_children_sokoban(current_node):
 
                 children.append(new_node)
         else:
-            # Si la posición no contiene una caja, generar un nuevo estado sin mover la caja
             new_state = generate_new_state(current_node, node_position)
             new_node = Node(current_node, node_position, new_state)
 
@@ -69,7 +63,6 @@ def generate_new_state(current_node, new_position):
     new_map = deepcopy(current_node.state.current_map)
     new_boxes = deepcopy(current_node.state.boxes)
     new_map[current_node.position[0]][current_node.position[1]] = EMPTY
-    # node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
     new_map[new_position[0]][new_position[1]] = EMPTY
 
     if new_position in current_node.state.boxes:
