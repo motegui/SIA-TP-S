@@ -29,3 +29,24 @@ pipenv install
 
 Ejecución
 --
+Para poder probar el proyecto hay que ejecutar el main.py que se encuentra en la carpeta user. En play.json se especifican las
+distintas condiciones: map, algorithm y heuristic
+### map
+Para el mapa se debe especificar el nivel con la palabra "level" seguido de su número. Existen niveles del 1 al 8.
+
+### algorithm
+Hay 5 opcciones de algoritmos:
+- BFS
+- DFS
+- LOCAL GREEDY
+- GLOBAL GREEDY
+- A*
+
+### heuristic
+Hay 4 tipos de heurísticas:
+- MANHATTAN
+- EUCLIDEAN
+- PLAYER MOVEMENTS
+- RANDOM
+
+**En caso de usar un algoritmo no informado (BFS o DFS) se debe especificar NONE en la heurística**

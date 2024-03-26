@@ -1,0 +1,6 @@
+{
+  "map": "LEVEL1",
+  "algorithm": "A*",
+  "heuristic": "MANHATTAN",
+  "output_file": "./output.json"
+}
