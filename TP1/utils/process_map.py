@@ -48,6 +48,5 @@ def process_map(map):
         matrix_1.append(row_1)
         matrix_2.append(row_2)
     state = State(matrix_1, goal_positions, box_positions)
-    end_state = State(matrix_2, goal_positions, goal_positions)
-    return state, end_state, start_position
+    return state, start_position
 

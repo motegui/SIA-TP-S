@@ -1,5 +1,5 @@
 import collections
-from node import Node
+from TP1.utils.node import Node
 
 
 def bfs(state, start_position, generate_children):
@@ -21,7 +21,10 @@ def bfs(state, start_position, generate_children):
                 closed_list.append(child)
                 opened_list.append(child)
 
-    return ["failure", None, expanded_nodes, len(opened_list), None]
+    return {
+            "status": "Failure", "cost": None, "expanded_nodes": expanded_nodes, "border": len(opened_list),
+            "path": None
+        }
 
 
 def dfs(state, start_position, generate_children):
@@ -43,7 +46,10 @@ def dfs(state, start_position, generate_children):
                 closed_list.append(child)
                 opened_list.append(child)
 
-    return ["failure", None, expanded_nodes, len(opened_list), None]
+    return {
+            "status": "Failure", "cost": None, "expanded_nodes": expanded_nodes, "border": len(opened_list),
+            "path": None
+        }
 
 
 def local_greedy(state, start_position, generate_children, heuristic):
@@ -75,7 +81,10 @@ def local_greedy(state, start_position, generate_children, heuristic):
                 closed_list.append(child)
                 opened_list.append(child)
 
-    return ["failure", None, expanded_nodes, len(opened_list), None]
+    return {
+            "status": "Failure", "cost": None, "expanded_nodes": expanded_nodes, "border": len(opened_list),
+            "path": None
+        }
 
 
 def global_greedy(state, start_position, generate_children, heuristic):
@@ -110,7 +119,10 @@ def global_greedy(state, start_position, generate_children, heuristic):
 
         opened_list = collections.deque(sorted(opened_list, key=lambda x: x.h, reverse=True))
 
-    return ["failure", None, expanded_nodes, len(opened_list), None]
+    return {
+            "status": "Failure", "cost": None, "expanded_nodes": expanded_nodes, "border": len(opened_list),
+            "path": None
+        }
 
 
 def astar(state, start_position, generate_children, heuristic):
@@ -156,7 +168,10 @@ def astar(state, start_position, generate_children, heuristic):
         closed_list.append(current_node)
         opened_list = collections.deque(sorted(opened_list, key=lambda x: (x.f, x.h), reverse=True))
 
-    return ["failure", None, expanded_nodes, len(opened_list), None]
+    return {
+            "status": "Failure", "cost": None, "expanded_nodes": expanded_nodes, "border": len(opened_list),
+            "path": None
+        }
 
 
 def create_response(current_node, expanded_nodes, opened_list_size):
@@ -166,5 +181,11 @@ def create_response(current_node, expanded_nodes, opened_list_size):
         path.append(current_node.position)
     path = path[::-1]
     if path is None:
-        return ["failure", None, expanded_nodes, opened_list_size, None]
-    return ["Success", len(path), expanded_nodes, opened_list_size, path]
+        return {
+            "status": "Failure", "cost": None, "expanded_nodes": expanded_nodes, "border": opened_list_size,
+            "path": None
+        }
+    return {
+        "status": "Success", "cost": len(path), "expanded_nodes": expanded_nodes, "border": opened_list_size,
+        "path": path
+    }

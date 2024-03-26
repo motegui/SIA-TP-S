@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 from TP1.utils.state import State
-from node import Node
+from TP1.utils.node import Node
 
 WALL = 35
 BOX = 36
