@@ -17,36 +17,28 @@ def read_file(file_name):
 
 def process_map(map):
     matrix_1 = []
-    matrix_2 = []
     box_positions = []
     goal_positions = []
     start_position = None
 
     for i in range(len(map)):
         row_1 = []
-        row_2 = []
         for j in range(len(map[i])):
             if map[i][j] == '@':
                 start_position = (i, j)
                 row_1.append(ord(' '))
-                row_2.append(ord(' '))
             elif map[i][j] == '$':
                 row_1.append(ord(map[i][j]))
-                row_2.append(ord(' '))
                 box_positions.append((i, j))
             elif map[i][j] == '.':
                 row_1.append(ord(' '))
-                row_2.append(ord('$'))
                 goal_positions.append((i, j))
             elif map[i][j] == '*':
                 row_1.append(ord('$'))
-                row_2.append(ord('$'))
             else:
                 row_1.append(ord(map[i][j]))
-                row_2.append(ord(map[i][j]))
 
         matrix_1.append(row_1)
-        matrix_2.append(row_2)
     state = State(matrix_1, goal_positions, box_positions)
     return state, start_position
 

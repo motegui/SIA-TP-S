@@ -30,19 +30,16 @@ def level_methods_bar_graph(data, miny, maxY, groupLabels, barLabels, barColors,
 
 
 def average_and_variance_graph(means, variances, labels, title, yLabel):
-    # Gráfico de barras
     x = np.arange(len(labels))
     width = 0.35
 
     fig, ax = plt.subplots()
     rects1 = ax.bar(x, means, width, yerr=variances, capsize=5)
 
-    # Configuración del gráfico
     ax.set_ylabel(yLabel)
     ax.set_title(title)
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
     ax.legend()
 
-    # Mostrar el gráfico
     plt.show()
