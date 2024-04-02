@@ -31,6 +31,8 @@ def contenido(poblacion, generacion):
 prev_generation = []
 # GENERACIONES_IGUALES = config['condicion_corte']['generacion']
 GENERACIONES_IGUALES = 0.9
+
+
 def estructura(poblacion, generacion):
     prop_iguales = 0
     global prev_generation
@@ -47,3 +49,11 @@ def estructura(poblacion, generacion):
         return True
     prev_generation = [p.cromosoma for p in poblacion]
     return False
+
+
+# MAX_FITNESS = config['condicion_corte']['optimo']
+MAX_FITNESS = 100
+
+
+def optimo(poblacion, generacion):
+    return max(poblacion, key=lambda x: x.fitness) >= MAX_FITNESS

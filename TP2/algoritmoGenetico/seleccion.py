@@ -43,7 +43,7 @@ def universal(poblacion, size):
         fitness_acumulado.append(fitness_acumulado_iter)
     # en esta posicion ya tengo el array con el fitness acumulado
     for i in range(size):
-        x = (random.random()+i) / size
+        x = (random.random() + i) / size
         for j, f in enumerate(fitness_acumulado):
             if x <= f:
                 nueva_poblacion.append(poblacion[j])
@@ -53,18 +53,24 @@ def universal(poblacion, size):
 
 # TORNEO_DETERMINISTICO_MUESTRA = config['seleccion']['torneoDeterministico']
 TORNEO_DETERMINISTICO_MUESTRA = 2
+
+
 def torneo_deterministico(poblacion, size):
     nueva_poblacion = []
     for i in range(size):
-        random_sample = random.sample(poblacion,TORNEO_DETERMINISTICO_MUESTRA)
+        random_sample = random.sample(poblacion, TORNEO_DETERMINISTICO_MUESTRA)
         nueva_poblacion.append(max(random_sample, key=lambda x: x.fitness))
     return nueva_poblacion
-TORNEO_PROBABILISTICO_THRESHOLD = 0.7 #todo validar que este entre 0.5 y 1
+
+
+TORNEO_PROBABILISTICO_THRESHOLD = 0.7  # todo validar que este entre 0.5 y 1
+
+
 def torneo_probabilistico(poblacion, size):
     nueva_poblacion = []
     for i in range(size):
-        p_max = poblacion[random.randint(0, len(poblacion)-1)]
-        p_min = poblacion[random.randint(0, len(poblacion)-1)]
+        p_max = poblacion[random.randint(0, len(poblacion) - 1)]
+        p_min = poblacion[random.randint(0, len(poblacion) - 1)]
         if p_max.fitness < p_min.fitness:
             aux = p_max
             p_max = p_min
@@ -77,5 +83,3 @@ def torneo_probabilistico(poblacion, size):
             nueva_poblacion.append(p_min)
 
     return nueva_poblacion
-
-

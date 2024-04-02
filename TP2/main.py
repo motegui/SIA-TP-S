@@ -15,15 +15,16 @@ def main():
     p1 = Player(Clase.DEFENSOR, [1.4, 20, 20, 20, 20, 70])
     p2 = Player(Clase.DEFENSOR, [1.4, 70, 20, 20, 20, 20])
     p3 = Player(Clase.DEFENSOR, [1.4, 10, 10, 10, 20, 100])
-    p4 = Player(Clase.DEFENSOR, [2, 100, 20, 20, 5, 5])
-    print(p1.fitness, p4.fitness)
+    p4 = Player(Clase.DEFENSOR, [2, 100, 500, 220, 5000, 5])
+    print(p4.cromosoma)
     poblacion = [p1, p2, p3, p4]
     t = universal([p1, p2, p3, p4], 10)
     for j, t3 in enumerate(t):
         a = ruleta(poblacion, 200)
-        usar = estructura(a[:4], j)
+        usar = estructura(poblacion, j)
 
         print(usar)
+
 
 
 if __name__ == '__main__':

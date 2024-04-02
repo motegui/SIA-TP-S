@@ -1,5 +1,3 @@
-import numpy as np
-
 from TP2.player.equipamiento import Equipamiento
 
 ALTURA = 0
@@ -11,11 +9,11 @@ VIDA = 5
 
 
 class Player:
-    def __init__(self, clase, cromosoma):  # Un jugador es creado con su clase y con su genotipo!
+    def __init__(self, clase, cromosoma):  # Un jugador es creado con su clase y con su cromosoma!
         self.clase = clase
         self.altura = cromosoma[ALTURA]
         self.equipamiento = Equipamiento(cromosoma[1:])
-        self.cromosoma = cromosoma
+        self.cromosoma = [cromosoma[0]] + self.equipamiento.get_items()
         if not 1.3 <= self.altura <= 2:
             raise ValueError("Altura entre 1.3 y 2 metros")
         self.fitness = self.clase.ataque * self.__ataque() + self.clase.defensa * self.__defensa()
@@ -31,5 +29,4 @@ class Player:
 
     def __defensa(self):
         return (self.equipamiento.resistencia_p() + self.equipamiento.pericia_p()) * self.equipamiento.vida_p() * self.__DEM()
-
 

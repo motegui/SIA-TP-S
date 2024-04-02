@@ -40,3 +40,6 @@ class Equipamiento:
 
     def vida_p(self):
         return 100 * np.tanh(0.01 * self.vida)
+
+    def get_items(self):
+        return [self.fuerza, self.agilidad, self.pericia, self.resistencia, self.vida]
