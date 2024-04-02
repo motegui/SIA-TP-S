@@ -125,4 +125,6 @@ Session.vim
 # auto-generated tag files
 tags
 
+*.pyc
+
 # End of https://www.gitignore.io/api/macos,vim,intellij,scala,sbt,git

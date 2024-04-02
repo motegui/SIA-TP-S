@@ -18,6 +18,7 @@ class Player:
         self.cromosoma = cromosoma
         if not 1.3 <= self.altura <= 2:
             raise ValueError("Altura entre 1.3 y 2 metros")
+        self.fitness = self.clase.ataque * self.__ataque() + self.clase.defensa * self.__defensa()
 
     def __ATM(self):
         return 0.5 - (3 * self.altura - 5) ** 4 + (3 * self.altura - 5) ** 2 + self.altura / 2
@@ -31,5 +32,4 @@ class Player:
     def __defensa(self):
         return (self.equipamiento.resistencia_p() + self.equipamiento.pericia_p()) * self.equipamiento.vida_p() * self.__DEM()
 
-    def desempeno(self):
-        return self.clase.ataque * self.__ataque() + self.clase.defensa * self.__defensa()
+
