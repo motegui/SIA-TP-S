@@ -1,3 +1,8 @@
 {
-  "cruce": {"probabilidadUniforme": 0.4}
+  "cruce": {"probabilidadUniforme": 0.4},
+  "probabilidad_mutacion" : 0.8,
+  "rango": {
+    "min": 0.2,
+    "max": 2
+  }
 }
