@@ -56,4 +56,4 @@ MAX_FITNESS = 100
 
 
 def optimo(poblacion, generacion):
-    return max(poblacion, key=lambda x: x.fitness) >= MAX_FITNESS
+    return max(poblacion, key=lambda x: x.fitness).fitness >= MAX_FITNESS

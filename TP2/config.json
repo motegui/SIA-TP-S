@@ -1,4 +1,5 @@
 {
+
   "cruce": {"probabilidadUniforme": 0.4},
   "probabilidad_mutacion" : 0.8,
   "rango": {
