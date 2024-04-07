@@ -86,9 +86,6 @@ def torneo_probabilistico(poblacion, size):
     return nueva_poblacion
 
 
-BOLTZMANN_TEMPERATURA = 10
-
-
 def ruleta_pseudo_aptitud(poblacion, aptitudes, size):
     nueva_poblacion = []
     # como tengo la nueva aptitud de cada uno pero no el acumulado, calculo el acumulado en el for de aptitud
@@ -104,15 +101,26 @@ def ruleta_pseudo_aptitud(poblacion, aptitudes, size):
     return nueva_poblacion
 
 
+T_C = 10  # temperatura critica
+T_0 = 200  # temperatura inicial
+T_K = 0.03  # cte arbitraria
+
+
+# gen es el nro de generacion
+def __temperatura(gen):
+    return T_C + (T_0 - T_C) * math.exp(-T_K * gen)
+
+
 def boltzmann(poblacion, size):
-    #calculo la suma de todos los boltzmann asi obtengo el exp_val relativo de cada individuo
-    sum_boltz_pob = sum(math.exp(p.fitness / BOLTZMANN_TEMPERATURA) for p in poblacion)
-    exp_val = [math.exp(p.fitness / BOLTZMANN_TEMPERATURA) / sum_boltz_pob for p in poblacion]
+    # calculo la suma de todos los boltzmann asi obtengo el exp_val relativo de cada individuo
+    gen = 0  # todo ver como recibir la generacion
+    sum_boltz_pob = sum(math.exp(p.fitness / __temperatura(gen)) for p in poblacion)
+    exp_val = [math.exp(p.fitness / __temperatura(gen)) / sum_boltz_pob for p in poblacion]
     return ruleta_pseudo_aptitud(poblacion, exp_val, size)
 
 
 def ranking(poblacion, size):
-    #primero ordeno la poblacion segun su fitness de mayor a menor
+    # primero ordeno la poblacion segun su fitness de mayor a menor
     poblacion_ordenada = sorted(poblacion, key=lambda x: x.fitness, reverse=True)
     max_fitness = poblacion_ordenada[0].fitness
     pseudo_aptitud = [(max_fitness - p.fitness) / max_fitness for p in poblacion_ordenada]
