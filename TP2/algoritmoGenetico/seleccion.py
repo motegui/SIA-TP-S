@@ -1,3 +1,4 @@
+import math
 import random
 
 
@@ -82,4 +83,25 @@ def torneo_probabilistico(poblacion, size):
         else:
             nueva_poblacion.append(p_min)
 
+    return nueva_poblacion
+
+
+BOLTZMANN_TEMPERATURA = 10
+
+
+def boltzmann(poblacion, size):
+    #calculo la suma de todos los boltzmann asi obtengo el exp_val relativo de cada individuo
+    sum_boltz_pob = sum(math.exp(p.fitness / BOLTZMANN_TEMPERATURA) for p in poblacion)
+    exp_val = [math.exp(p.fitness / BOLTZMANN_TEMPERATURA) / sum_boltz_pob for p in poblacion]
+    nueva_poblacion = []
+    # como tengo el exp_val de cada uno pero no el acumulado, calculo el acumulado en el for de exp_val
+    # es = a la ruleta solo que le agrego la suma de acumulado
+    for i in range(size):
+        x = (random.random() + i) / size
+        acumulado = 0
+        for j, prob in enumerate(exp_val):
+            acumulado += prob
+            if acumulado >= x:
+                nueva_poblacion.append(poblacion[j])
+                break
     return nueva_poblacion
