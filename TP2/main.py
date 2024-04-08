@@ -4,7 +4,6 @@ from TP2.algoritmoGenetico.condicion_corte import contenido, estructura, optimo,
 from TP2.algoritmoGenetico.cruces import *
 from TP2.algoritmoGenetico.no_uniformes import creciente, decreciente
 from TP2.algoritmoGenetico.seleccion import elite, universal, ruleta
-from TP2.player.equipamiento import Equipamiento
 from TP2.player.clase import Clase
 from TP2.player.player import Player
 from TP2.config import config
@@ -13,12 +12,6 @@ from TP2.algoritmoGenetico.mutacion import mutar_poblacion, gen
 
 PROBABILIDAD_MUTACION = config.get('probabilidad_mutacion')
 
-# ALTURA = 0
-# FUERZA = 1
-# AGILIDAD = 2
-# PERICIA = 3
-# RESISTENCIA = 4
-# VIDA = 5
 
 condiciones_corte = {
     'estructura': estructura,
