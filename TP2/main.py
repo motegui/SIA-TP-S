@@ -1,3 +1,5 @@
+import math
+
 from TP2.algoritmoGenetico.condicion_corte import contenido, estructura
 from TP2.algoritmoGenetico.cruces import *
 from TP2.algoritmoGenetico.seleccion import elite, universal, ruleta
@@ -5,9 +7,37 @@ from TP2.player.equipamiento import Equipamiento
 from TP2.player.clase import Clase
 from TP2.player.player import Player
 from TP2.config import config
+from TP2.player.player import generar_cromosoma
 
 PROBABILIDAD_MUTACION = config.get('probabilidad_mutacion')
+
+# ALTURA = 0
+# FUERZA = 1
+# AGILIDAD = 2
+# PERICIA = 3
+# RESISTENCIA = 4
+# VIDA = 5
+
 def main():
+    clase = config.get("clase")
+    n = config.get('n')
+    poblacion_inicial = []
+    for i in range(1, n):
+        cromosoma = [round(random.uniform(1.3, 2), 2)] #Agrego la altura
+        cromosoma += generar_cromosoma()
+        poblacion_inicial.append(Player(Clase[clase], cromosoma))
+
+    poblacion_actual = poblacion_inicial
+    while (contenido(poblacion=poblacion_actual, generacion=1)):
+        k = config.get("k")
+        A = config.get("A")
+        padres = (ruleta(poblacion=poblacion_actual, size=math.floor(k * A))
+                  + ruleta(poblacion=poblacion_actual, size=k-math.floor(k * A)))
+
+
+        hijos = [] #Paso los padres al metodo de cruza
+        #Muto hijos
+        poblacion_actual = [] #Metodo de seleccion 2 sobre los k + n
 
     #armar la pobla inicial. agarro el numerito y creo tipitos (del tipo)
     #arrancamos la iter
@@ -20,29 +50,29 @@ def main():
         #De la nueva poblacion (k + n) agarro con el metodo de selcccc vol 2 los n muchachos (joven o tradicional SE SACA DEL JSON Y B Y METODO 3 y 4 tambien)
         #REPITO TOD
 
-
-
-    aux = [1, 2, 3, 4, 5, 1, 1, 1]
-    aux.remove(1)
-    print(aux)
-    print(2 in aux)
-
-
-
-    p1 = Player(Clase.DEFENSOR, [1.4, 20, 20, 20, 20, 70])
-    p2 = Player(Clase.DEFENSOR, [1.4, 70, 20, 20, 20, 20])
-    p3 = Player(Clase.DEFENSOR, [1.4, 10, 10, 10, 20, 100])
-    p4 = Player(Clase.DEFENSOR, [2, 100, 500, 220, 5000, 5])
-    print(p4.cromosoma)
-    print(PROBABILIDAD_MUTACION)
-    poblacion = [p1, p2, p3, p4]
-    t = universal([p1, p2, p3, p4], 10)
-    for j, t3 in enumerate(t):
-        a = ruleta(poblacion, 200)
-        usar = estructura(poblacion, j)
-
-        print(usar)
-
+    #
+    #
+    # aux = [1, 2, 3, 4, 5, 1, 1, 1]
+    # aux.remove(1)
+    # print(aux)
+    # print(2 in aux)
+    #
+    #
+    #
+    # p1 = Player(Clase.DEFENSOR, [1.4, 20, 20, 20, 20, 70])
+    # p2 = Player(Clase.DEFENSOR, [1.4, 70, 20, 20, 20, 20])
+    # p3 = Player(Clase.DEFENSOR, [1.4, 10, 10, 10, 20, 100])
+    # p4 = Player(Clase.DEFENSOR, [2, 100, 500, 220, 5000, 5])
+    # print(p4.cromosoma)
+    # print(PROBABILIDAD_MUTACION)
+    # poblacion = [p1, p2, p3, p4]
+    # t = universal([p1, p2, p3, p4], 10)
+    # for j, t3 in enumerate(t):
+    #     a = ruleta(poblacion, 200)
+    #     usar = estructura(poblacion, j)
+    #
+    #     print(usar)
+    #
 
 
 if __name__ == '__main__':

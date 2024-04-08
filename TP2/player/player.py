@@ -1,3 +1,5 @@
+import random
+
 from TP2.player.equipamiento import Equipamiento
 
 ALTURA = 0
@@ -25,8 +27,22 @@ class Player:
         return 2 + (3 * self.altura - 5) ** 4 - (3 * self.altura - 5) ** 2 - self.altura / 2
 
     def __ataque(self):
-        return (self.equipamiento.agilidad_p() + self.equipamiento.pericia_p()) * self.equipamiento.fuerza_p() * self.__ATM()
+        return (
+                    self.equipamiento.agilidad_p() + self.equipamiento.pericia_p()) * self.equipamiento.fuerza_p() * self.__ATM()
 
     def __defensa(self):
-        return (self.equipamiento.resistencia_p() + self.equipamiento.pericia_p()) * self.equipamiento.vida_p() * self.__DEM()
+        return (
+                    self.equipamiento.resistencia_p() + self.equipamiento.pericia_p()) * self.equipamiento.vida_p() * self.__DEM()
 
+
+def generar_cromosoma():
+    puntos_totales = 150
+    puntos_asignados = []
+
+    for _ in range(4):
+        puntos = round(random.uniform(0, puntos_totales), 2)
+        puntos_asignados.append(puntos)
+        puntos_totales -= puntos
+
+    puntos_asignados.append(puntos_totales)
+    return puntos_asignados
