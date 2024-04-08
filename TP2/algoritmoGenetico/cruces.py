@@ -2,6 +2,8 @@ import math
 import random
 
 from TP2.config import config
+from TP2.player.clase import Clase
+from TP2.player.player import Player
 
 
 def un_punto(c1, c2):
@@ -38,7 +40,7 @@ def anular(c1, c2):
     return [h1, h2]
 
 
-PROBABILIDAD_UNIFORME = config['cruce']['probabilidadUniforme']
+PROBABILIDAD_UNIFORME = config.get('cruce').get('probabilidadUniforme')
 
 
 def uniforme(c1, c2):
@@ -52,3 +54,13 @@ def uniforme(c1, c2):
             h1.append(c1[i])
             h2.append(c2[i])
     return [h1, h2]
+
+
+def cruzar_poblacion(poblacion, metodo_de_cruce):
+    cromosomas = []
+    for i in range(0, len(poblacion)-1, 2):
+        cromosomas += metodo_de_cruce(poblacion[i].cromosoma, poblacion[i+1].cromosoma)
+
+    cromosomas += metodo_de_cruce(poblacion[0].cromosoma, poblacion[-1].cromosoma)
+
+    return cromosomas[:len(poblacion)]

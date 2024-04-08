@@ -40,9 +40,10 @@ def generar_cromosoma():
     puntos_asignados = []
 
     for _ in range(4):
-        puntos = round(random.uniform(0, puntos_totales), 2)
+        puntos = round(random.uniform(0, puntos_totales-1), 2)
         puntos_asignados.append(puntos)
         puntos_totales -= puntos
 
     puntos_asignados.append(puntos_totales)
+    puntos_asignados.insert(0, round(random.uniform(1.3, 2), 2))
     return puntos_asignados

@@ -2,18 +2,16 @@ import copy
 
 from TP2.config import config
 
-# MAX_GENERACIONES = config['condicion_corte']['generacion']
-MAX_GENERACIONES = 2
+MAX_GENERACIONES = config.get('condicion_corte').get('MAX_GENERACION')
 
 
 def cantidad_generaciones(poblacion, generacion):
     return generacion >= MAX_GENERACIONES
 
 
-generaciones_sin_cambios = 0
-max_fitness = 0
-# GENERACIONES_IGUAL_FITNESS = config['condicion_corte']['generacion']
-GENERACIONES_IGUAL_FITNESS = 2
+generaciones_sin_cambios = config.get("condicion_corte").get("GENERACIONES_SIN_CAMBIO")
+max_fitness = config.get("condicion_corte").get("MAX_FITNESS")
+GENERACIONES_IGUAL_FITNESS = config.get('condicion_corte').get('GENERACIONES_IGUAL_FITNESS')
 
 
 def contenido(poblacion, generacion):
@@ -29,8 +27,7 @@ def contenido(poblacion, generacion):
 
 
 prev_generation = []
-# GENERACIONES_IGUALES = config['condicion_corte']['generacion']
-GENERACIONES_IGUALES = 0.9
+GENERACIONES_IGUALES = config.get('condicion_corte').get('GENERACIONES_IGUALES')
 
 
 def estructura(poblacion, generacion):
@@ -51,8 +48,7 @@ def estructura(poblacion, generacion):
     return False
 
 
-# MAX_FITNESS = config['condicion_corte']['optimo']
-MAX_FITNESS = 100
+MAX_FITNESS = config.get('condicion_corte').get('MAX_FITNESS')
 
 
 def optimo(poblacion, generacion):
