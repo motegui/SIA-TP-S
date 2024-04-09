@@ -1,6 +1,6 @@
 {
   "clase": "DEFENSOR",
-  "n": 50,
+  "n": 100,
   "K": 7,
   "A": 0.5,
   "B": 0.3,
@@ -9,27 +9,27 @@
   "metodo3": "ruleta",
   "metodo4": "ruleta",
   "condicion_corte": {
-    "tipo": "optimo",
-    "MAX_FITNESS": 50,
+    "tipo": "estructura",
+    "MAX_FITNESS": 40,
     "GENERACIONES_IGUALES": 0.9,
-    "GENERACIONES_SIN_CAMBIO": 0,
-    "GENERACIONES_IGUAL_FITNESS": 2,
-    "MAX_GENERACION": 4
+    "GENERACIONES_SIN_CAMBIO": 3,
+    "GENERACIONES_IGUAL_FITNESS": 6,
+    "MAX_GENERACION": 10000
   },
   "seleccion": {
     "TORNEO_DETERMINISTICO_MUESTRA": 2,
     "TORNEO_PROBABILISTICO_THRESHOLD": 0.7
   },
   "cruce": {"probabilidadUniforme": 0.4},
-  "probabilidad_mutacion" : 0.8,
+  "probabilidad_mutacion" : 0.7,
   "rango": {
     "min": 0.2,
     "max": 2
   },
   "favorecer_jovenes": true,
   "metodo_cruce": "un_punto",
-  "funcion_no_uniforme": "creciente",
-  "factor": 0.4,
+  "funcion_no_uniforme": null,
+  "factor": 0.01,
   "T_C" : 10,
   "T_0" : 200 ,
   "T_K" : 0.03
