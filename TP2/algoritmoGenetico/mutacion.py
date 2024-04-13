@@ -29,6 +29,27 @@ def multi_gen_uniforme(cromosoma, probabilidad_mutacion):
     return cromosoma
 
 
+def multi_gen_limitada(cromosoma, probabilidad_mutacion):
+    # elegimos la cantidad de genes que se van a iterar
+    cantidad = random.randint(0, len(cromosoma))
+    genes_iterados = []  # arreglo donde guardamos los genes que ya se iteraron
+
+    for i in range(0, cantidad):
+        # elegimos un gen random para mutar
+        gen_a_iterar = random.randint(0, len(cromosoma))
+        if random.random() < probabilidad_mutacion:
+            # si este gen ya fue iterado no hacemos nada
+            if gen_a_iterar in genes_iterados:
+                break
+            if gen_a_iterar == ALTURA:
+                cromosoma[ALTURA] = random.uniform(1.3, 2)
+            else:
+                cromosoma[i] = random.uniform(cromosoma[i] * RANGO['min'], cromosoma[i] * RANGO['max'])
+            genes_iterados.append(gen_a_iterar)  # guardamos el gen para no repetirlo
+
+    return cromosoma
+
+
 def completa(cromosoma, probabilidad_mutacion):
     if random.random() < probabilidad_mutacion:
         for i in range(0, len(cromosoma)):
@@ -37,7 +58,7 @@ def completa(cromosoma, probabilidad_mutacion):
             else:
                 cromosoma[i] = random.uniform(cromosoma[i] * RANGO['min'], cromosoma[i] * RANGO['max'])
 
-        return cromosoma
+    return cromosoma
 
 
 def mutar_poblacion(cromosomas, metodo, probabilidad_mutacion):

@@ -3,12 +3,12 @@ import json
 from TP2.algoritmoGenetico.condicion_corte import contenido, estructura, optimo, cantidad_generaciones
 from TP2.algoritmoGenetico.cruces import *
 from TP2.algoritmoGenetico.no_uniformes import creciente, decreciente
-from TP2.algoritmoGenetico.seleccion import elite, universal, ruleta
+from TP2.algoritmoGenetico.seleccion import *
 from TP2.player.clase import Clase
 from TP2.player.player import Player
 from TP2.config import config
 from TP2.player.player import generar_cromosoma
-from TP2.algoritmoGenetico.mutacion import mutar_poblacion, gen
+from TP2.algoritmoGenetico.mutacion import mutar_poblacion, gen, multi_gen_uniforme, completa, multi_gen_limitada
 from TP2.custom_config import custom_config
 
 PROBABILIDAD_MUTACION = config.get('probabilidad_mutacion')
@@ -23,7 +23,12 @@ condiciones_corte = {
 metodos_seleccion = {
     'elite': elite,
     'universal': universal,
-    'ruleta': ruleta
+    'ruleta': ruleta,
+    'boltzman': boltzmann,
+    'determinista': torneo_deterministico,
+    'probabilistica': torneo_probabilistico,
+    'ranking': ranking
+
 }
 
 metodo_cruce = {
@@ -34,6 +39,13 @@ metodo_cruce = {
 metodos_no_uniformes = {
     "creciente": creciente,
     "decreciente": decreciente
+}
+
+metodos_mutacion_uniforme = {
+    "gen": gen,
+    "multigen": multi_gen_uniforme,
+    "completa": completa,
+    "limitada": multi_gen_limitada
 }
 
 
@@ -63,16 +75,48 @@ def fitness_promedio(poblacion):
 # Para una configuracion dada, corro 100 veces
 def simular_100_veces(archivo_config):
     simulaciones = []
-    for i in range(20):
-        iteracion(archivo_config)
+    for i in range(5):
+        simulaciones.append(iteracion(archivo_config))
+    return simulaciones
 
 
-def crear_configuracion(probabilidad_mutacion, metodo_cruce):
+def crear_configuracion_mutacion(probabilidad_mutacion, metodo_mutacion, funcion_no_uniforme):
     with open('config.json', 'r') as file:
         config_data = json.load(file)
 
     if probabilidad_mutacion is not None:
         config_data['probabilidad_mutacion'] = probabilidad_mutacion
+    if metodo_mutacion is not None:
+        config_data['metodo_mutacion_uniforme'] = metodo_mutacion
+    config_data['funcion_no_uniforme'] = funcion_no_uniforme
+
+    with open('custom_config.json', 'w') as file:
+        json.dump(config_data, file, indent=4)
+        file.flush()
+    file.close()
+
+
+def crear_configuracion_sesgo(sesgo_joven:bool):
+    with open('config.json', 'r') as file:
+        config_data = json.load(file)
+
+    if sesgo_joven is not None:
+        config_data['favorecer_jovenes'] = sesgo_joven
+
+    with open('custom_config.json', 'w') as file:
+        json.dump(config_data, file, indent=4)
+        file.flush()
+    file.close()
+
+
+def crear_configuracion_seleccion(metodo1, metodo2):
+    with open('config.json', 'r') as file:
+        config_data = json.load(file)
+
+    if metodo1 is not None:
+        config_data['metodo1'] = metodo1
+    if metodo2 is not None:
+        config_data['metodo2'] = metodo2
 
     with open('custom_config.json', 'w') as file:
         json.dump(config_data, file, indent=4)

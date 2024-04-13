@@ -34,14 +34,14 @@ def estructura(poblacion, generacion):
     prop_iguales = 0
     global prev_generation
     nueva_poblacion = [p.cromosoma for p in poblacion]
-    print(prev_generation)
-    print(nueva_poblacion)
+    # print(prev_generation)
+    # print(nueva_poblacion)
     for gen in prev_generation:
         if gen in nueva_poblacion:
             nueva_poblacion.remove(gen)
             prop_iguales += 1
     prop_iguales /= len(poblacion)
-    print(prop_iguales)
+    # print(prop_iguales)
     if prop_iguales >= GENERACIONES_IGUALES:
         return True
     prev_generation = [p.cromosoma for p in poblacion]
