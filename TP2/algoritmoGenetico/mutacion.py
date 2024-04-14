@@ -36,7 +36,7 @@ def multi_gen_limitada(cromosoma, probabilidad_mutacion):
 
     for i in range(0, cantidad):
         # elegimos un gen random para mutar
-        gen_a_iterar = random.randint(0, len(cromosoma))
+        gen_a_iterar = random.randint(0, len(cromosoma)-1)
         if random.random() < probabilidad_mutacion:
             # si este gen ya fue iterado no hacemos nada
             if gen_a_iterar in genes_iterados:
@@ -44,7 +44,7 @@ def multi_gen_limitada(cromosoma, probabilidad_mutacion):
             if gen_a_iterar == ALTURA:
                 cromosoma[ALTURA] = random.uniform(1.3, 2)
             else:
-                cromosoma[i] = random.uniform(cromosoma[i] * RANGO['min'], cromosoma[i] * RANGO['max'])
+                cromosoma[gen_a_iterar] = random.uniform(cromosoma[gen_a_iterar] * RANGO['min'], cromosoma[gen_a_iterar] * RANGO['max'])
             genes_iterados.append(gen_a_iterar)  # guardamos el gen para no repetirlo
 
     return cromosoma

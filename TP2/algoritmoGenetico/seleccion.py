@@ -100,9 +100,6 @@ def ruleta_pseudo_aptitud(poblacion, aptitudes, n):
     return nueva_poblacion
 
 
-
-
-
 # gen es el nro de generacion
 def __temperatura(gen):
     T_C = config.get('T_C')

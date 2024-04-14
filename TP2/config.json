@@ -1,17 +1,17 @@
 {
     "clase": "GUERRERO",
-    "n": 100,
+    "n": 25,
     "K": 20,
     "A": 0.5,
     "B": 0.5,
-    "metodo1": "ruleta",
-    "metodo2": "elite",
+    "metodo1": "boltzman",
+    "metodo2": "determinista",
     "metodo3": "elite",
     "metodo4": "determinista",
     "condicion_corte": {
         "tipo": "estructura",
         "MAX_FITNESS": 60,
-        "GENERACIONES_IGUALES": 0.9,
+        "GENERACIONES_IGUALES": 0.7,
         "GENERACIONES_SIN_CAMBIO": 3,
         "GENERACIONES_IGUAL_FITNESS": 6,
         "MAX_GENERACION": 15

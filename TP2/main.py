@@ -75,7 +75,7 @@ def fitness_promedio(poblacion):
 # Para una configuracion dada, corro 100 veces
 def simular_100_veces(archivo_config):
     simulaciones = []
-    for i in range(5):
+    for i in range(100):
         simulaciones.append(iteracion(archivo_config))
     return simulaciones
 
@@ -96,7 +96,7 @@ def crear_configuracion_mutacion(probabilidad_mutacion, metodo_mutacion, funcion
     file.close()
 
 
-def crear_configuracion_sesgo(sesgo_joven:bool):
+def crear_configuracion_sesgo(sesgo_joven: bool):
     with open('config.json', 'r') as file:
         config_data = json.load(file)
 
@@ -124,6 +124,21 @@ def crear_configuracion_seleccion(metodo1, metodo2):
     file.close()
 
 
+def crear_configuracion_reemplazo(metodo3, metodo4):
+    with open('config.json', 'r') as file:
+        config_data = json.load(file)
+
+    if metodo3 is not None:
+        config_data['metodo3'] = metodo3
+    if metodo4 is not None:
+        config_data['metodo4'] = metodo4
+
+    with open('custom_config.json', 'w') as file:
+        json.dump(config_data, file, indent=4)
+        file.flush()
+    file.close()
+
+
 def iteracion(config=config):
     clase = config.get("clase")
     n = config.get('n')
@@ -135,6 +150,7 @@ def iteracion(config=config):
 
     poblacion_actual = poblacion_inicial
     generacion_actual = 1
+    # print(config.get("metodo_mutacion_uniforme"))
     while not condiciones_corte[config.get('condicion_corte').get('tipo')](poblacion_actual, generacion_actual):
         K = config.get("K")
         A = config.get("A")
@@ -148,13 +164,14 @@ def iteracion(config=config):
         cromosomas_hijos = cruzar_poblacion(padres, metodo_cruce[config.get('metodo_cruce')])
 
         prob_mutacion = config.get('probabilidad_mutacion')
+        # print(prob_mutacion)
         if config.get('funcion_no_uniforme') is not None:
             prob_mutacion = (metodos_no_uniformes[config.get('funcion_no_uniforme')]
                              (prob_mutacion,
                               generacion_actual, config.get('factor')
                               ))
 
-        cromosomas_mutados = mutar_poblacion(cromosomas_hijos, gen, prob_mutacion)
+        cromosomas_mutados = mutar_poblacion(cromosomas_hijos, metodos_mutacion_uniforme[config.get("metodo_mutacion_uniforme")], prob_mutacion)
 
         hijos = []
         for cromosoma in cromosomas_mutados:
