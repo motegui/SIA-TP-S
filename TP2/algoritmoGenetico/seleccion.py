@@ -12,6 +12,7 @@ def elite(poblacion, n, generacion):
     while iter != n:
         nueva_poblacion.append(sorted_poblacion[iter % poblacion_len])
         iter += 1
+
     return nueva_poblacion
 
 

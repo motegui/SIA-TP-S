@@ -1,5 +1,7 @@
 import math
 import json
+import random
+
 from TP2.algoritmoGenetico.condicion_corte import contenido, estructura, optimo, cantidad_generaciones
 from TP2.algoritmoGenetico.cruces import *
 from TP2.algoritmoGenetico.no_uniformes import creciente, decreciente
@@ -10,6 +12,7 @@ from TP2.config import config
 from TP2.player.player import generar_cromosoma
 from TP2.algoritmoGenetico.mutacion import mutar_poblacion, gen, multi_gen_uniforme, completa, multi_gen_limitada
 from TP2.custom_config import custom_config
+
 
 PROBABILIDAD_MUTACION = config.get('probabilidad_mutacion')
 
@@ -77,8 +80,11 @@ def fitness_promedio(poblacion):
 # Para una configuracion dada, corro 100 veces
 def simular_100_veces(archivo_config):
     simulaciones = []
+    print(archivo_config.get('metodo_mutacion_uniforme'))
     for i in range(100):
-        simulaciones.append(iteracion(archivo_config))
+        iter = iteracion(archivo_config)
+        simulaciones.append(iter)
+
     return simulaciones
 
 
@@ -229,5 +235,4 @@ def main():
 
 
 if __name__ == '__main__':
-    crear_configuracion(1, None)
     main()
