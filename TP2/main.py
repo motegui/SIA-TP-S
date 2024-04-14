@@ -33,7 +33,9 @@ metodos_seleccion = {
 
 metodo_cruce = {
     'un_punto': un_punto,
-    'dos_puntos': dos_puntos
+    'dos_puntos': dos_puntos,
+    'anular': anular,
+    'uniforme': uniforme
 }
 
 metodos_no_uniformes = {
@@ -102,6 +104,19 @@ def crear_configuracion_sesgo(sesgo_joven: bool):
 
     if sesgo_joven is not None:
         config_data['favorecer_jovenes'] = sesgo_joven
+
+    with open('custom_config.json', 'w') as file:
+        json.dump(config_data, file, indent=4)
+        file.flush()
+    file.close()
+
+
+def crear_configuracion_cruce(metodo_cruce):
+    with open('config.json', 'r') as file:
+        config_data = json.load(file)
+
+    if metodo_cruce is not None:
+        config_data['metodo_cruce'] = metodo_cruce
 
     with open('custom_config.json', 'w') as file:
         json.dump(config_data, file, indent=4)

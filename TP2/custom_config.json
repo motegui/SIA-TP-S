@@ -1,11 +1,11 @@
 {
     "clase": "GUERRERO",
-    "n": 25,
+    "n": 50,
     "K": 20,
     "A": 0.5,
     "B": 0.5,
     "metodo1": "boltzman",
-    "metodo2": "determinista",
+    "metodo2": "universal",
     "metodo3": "elite",
     "metodo4": "determinista",
     "condicion_corte": {
@@ -29,8 +29,8 @@
         "min": 0.2,
         "max": 2
     },
-    "favorecer_jovenes": true,
-    "metodo_cruce": "un_punto",
+    "favorecer_jovenes": false,
+    "metodo_cruce": "uniforme",
     "funcion_no_uniforme": null,
     "factor": 0.01,
     "T_C": 5,
