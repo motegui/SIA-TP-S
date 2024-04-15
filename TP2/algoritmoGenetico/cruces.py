@@ -40,14 +40,12 @@ def anular(c1, c2):
     return [h1, h2]
 
 
-PROBABILIDAD_UNIFORME = config.get('cruce').get('probabilidadUniforme')
-
-
 def uniforme(c1, c2):
     h1 = []
     h2 = []
+    probabilidad = config.get('cruce').get('probabilidad')
     for i in range(len(c1)):
-        if random.random() < PROBABILIDAD_UNIFORME:
+        if random.random() < probabilidad:
             h1.append(c2[i])
             h2.append(c1[i])
         else:
@@ -56,11 +54,20 @@ def uniforme(c1, c2):
     return [h1, h2]
 
 
-def cruzar_poblacion(poblacion, metodo_de_cruce):
+def cruzar_poblacion_escalonado(poblacion, metodo_de_cruce):
     cromosomas = []
-    for i in range(0, len(poblacion)-1, 2):
-        cromosomas += metodo_de_cruce(poblacion[i].cromosoma, poblacion[i+1].cromosoma)
+    for i in range(0, len(poblacion) - 1, 2):
+        cromosomas += metodo_de_cruce(poblacion[i].cromosoma, poblacion[i + 1].cromosoma)
 
     cromosomas += metodo_de_cruce(poblacion[0].cromosoma, poblacion[-1].cromosoma)
 
     return cromosomas[:len(poblacion)]
+
+
+def cruzar_poblacion_puntas(poblacion, metodo_de_cruce):
+    cromosomas = []
+    for i in range(len(poblacion) // 2):
+        cromosomas += metodo_de_cruce(poblacion[i].cromosoma, poblacion[-(i + 1)].cromosoma)
+
+    return cromosomas[:len(poblacion)]
+

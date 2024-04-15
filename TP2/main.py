@@ -14,8 +14,6 @@ from TP2.algoritmoGenetico.mutacion import mutar_poblacion, gen, multi_gen_unifo
 from TP2.custom_config import custom_config
 
 
-PROBABILIDAD_MUTACION = config.get('probabilidad_mutacion')
-
 condiciones_corte = {
     'estructura': estructura,
     'optimo': optimo,
@@ -27,7 +25,7 @@ metodos_seleccion = {
     'elite': elite,
     'universal': universal,
     'ruleta': ruleta,
-    'boltzman': boltzmann,
+    'boltzmann': boltzmann,
     'determinista': torneo_deterministico,
     'probabilistica': torneo_probabilistico,
     'ranking': ranking
@@ -51,6 +49,12 @@ metodos_mutacion_uniforme = {
     "multigen": multi_gen_uniforme,
     "completa": completa,
     "limitada": multi_gen_limitada
+}
+
+metodo_seleccion_cruce = {
+    "puntas": cruzar_poblacion_puntas,
+    "escalonado": cruzar_poblacion_escalonado,
+    "fitness": cruzar_poblacion_escalonado
 }
 
 
@@ -80,7 +84,7 @@ def fitness_promedio(poblacion):
 # Para una configuracion dada, corro 100 veces
 def simular_100_veces(archivo_config):
     simulaciones = []
-    print(archivo_config.get('metodo_mutacion_uniforme'))
+    print(archivo_config.get('mutacion').get('metodo'))
     for i in range(100):
         iter = iteracion(archivo_config)
         simulaciones.append(iter)
@@ -93,10 +97,11 @@ def crear_configuracion_mutacion(probabilidad_mutacion, metodo_mutacion, funcion
         config_data = json.load(file)
 
     if probabilidad_mutacion is not None:
-        config_data['probabilidad_mutacion'] = probabilidad_mutacion
+        config_data['mutacion']['probabilidad'] = probabilidad_mutacion
+
     if metodo_mutacion is not None:
-        config_data['metodo_mutacion_uniforme'] = metodo_mutacion
-    config_data['funcion_no_uniforme'] = funcion_no_uniforme
+        config_data['mutacion']['metodo'] = metodo_mutacion
+    config_data['mutacion']['no_uniforme']['funcion'] = funcion_no_uniforme
 
     with open('custom_config.json', 'w') as file:
         json.dump(config_data, file, indent=4)
@@ -109,7 +114,7 @@ def crear_configuracion_sesgo(sesgo_joven: bool):
         config_data = json.load(file)
 
     if sesgo_joven is not None:
-        config_data['favorecer_jovenes'] = sesgo_joven
+        config_data['sesgo']['joven'] = sesgo_joven
 
     with open('custom_config.json', 'w') as file:
         json.dump(config_data, file, indent=4)
@@ -117,12 +122,15 @@ def crear_configuracion_sesgo(sesgo_joven: bool):
     file.close()
 
 
-def crear_configuracion_cruce(metodo_cruce):
+def crear_configuracion_cruce(metodo_cruce, metodo_seleccion):
     with open('config.json', 'r') as file:
         config_data = json.load(file)
 
     if metodo_cruce is not None:
-        config_data['metodo_cruce'] = metodo_cruce
+        config_data['cruce']['metodo'] = metodo_cruce
+
+    if metodo_seleccion is not None:
+        config_data['cruce']['metodo_seleccion_cruce'] = metodo_seleccion
 
     with open('custom_config.json', 'w') as file:
         json.dump(config_data, file, indent=4)
@@ -135,9 +143,9 @@ def crear_configuracion_seleccion(metodo1, metodo2):
         config_data = json.load(file)
 
     if metodo1 is not None:
-        config_data['metodo1'] = metodo1
+        config_data['seleccion']['metodo1'] = metodo1
     if metodo2 is not None:
-        config_data['metodo2'] = metodo2
+        config_data['seleccion']['metodo2'] = metodo2
 
     with open('custom_config.json', 'w') as file:
         json.dump(config_data, file, indent=4)
@@ -150,9 +158,9 @@ def crear_configuracion_reemplazo(metodo3, metodo4):
         config_data = json.load(file)
 
     if metodo3 is not None:
-        config_data['metodo3'] = metodo3
+        config_data['reemplazo']['metodo3'] = metodo3
     if metodo4 is not None:
-        config_data['metodo4'] = metodo4
+        config_data['reemplazo']['metodo4'] = metodo4
 
     with open('custom_config.json', 'w') as file:
         json.dump(config_data, file, indent=4)
@@ -171,53 +179,54 @@ def iteracion(config=config):
 
     poblacion_actual = poblacion_inicial
     generacion_actual = 1
-    # print(config.get("metodo_mutacion_uniforme"))
     while not condiciones_corte[config.get('condicion_corte').get('tipo')](poblacion_actual, generacion_actual):
         K = config.get("K")
-        A = config.get("A")
-        B = config.get("B")
+        A = config.get("seleccion").get("A")
+        B = config.get("reemplazo").get("B")
 
-        padres = (metodos_seleccion[config.get('metodo1')](poblacion=poblacion_actual, n=math.floor(K * A),
+        padres = (metodos_seleccion[config.get('seleccion').get('metodo1')](poblacion=poblacion_actual, n=math.floor(K * A),
                                                            generacion=generacion_actual) +
-                  metodos_seleccion[config.get('metodo2')](poblacion=poblacion_actual, n=K - math.floor(K * A),
+                  metodos_seleccion[config.get('seleccion').get('metodo2')](poblacion=poblacion_actual, n=K - math.floor(K * A),
                                                            generacion=generacion_actual))
 
-        cromosomas_hijos = cruzar_poblacion(padres, metodo_cruce[config.get('metodo_cruce')])
+        if config.get("cruce").get("metodo_seleccion_cruce") == 'fitness':
+            padres = sorted(padres, key=lambda x: x.fitness, reverse=True)
+        cromosomas_hijos = metodo_seleccion_cruce[config.get("cruce").get("metodo_seleccion_cruce")](padres, metodo_cruce[config.get('cruce').get('metodo')])
 
-        prob_mutacion = config.get('probabilidad_mutacion')
+        prob_mutacion = config.get('mutacion').get('probabilidad')
         # print(prob_mutacion)
-        if config.get('funcion_no_uniforme') is not None:
-            prob_mutacion = (metodos_no_uniformes[config.get('funcion_no_uniforme')]
+        if config.get('mutacion').get('no_uniforme').get('funcion') is not None:
+            prob_mutacion = (metodos_no_uniformes[config.get('mutacion').get('no_uniforme').get('funcion')]
                              (prob_mutacion,
-                              generacion_actual, config.get('factor')
+                              generacion_actual, config.get('mutacion').get('no_uniforme').get('factor')
                               ))
 
-        cromosomas_mutados = mutar_poblacion(cromosomas_hijos, metodos_mutacion_uniforme[config.get("metodo_mutacion_uniforme")], prob_mutacion)
+        cromosomas_mutados = mutar_poblacion(cromosomas_hijos, metodos_mutacion_uniforme[config.get("mutacion").get("metodo")], prob_mutacion)
 
         hijos = []
         for cromosoma in cromosomas_mutados:
             hijos.append(Player(Clase[clase], cromosoma))
 
-        if not config.get('favorecer_jovenes'):
+        if not config.get('sesgo').get('joven'):
             poblacion_k_mas_n = poblacion_actual + hijos
             poblacion_actual = (
-                    metodos_seleccion[config.get('metodo3')](poblacion=poblacion_k_mas_n, n=math.floor(n * B),
+                    metodos_seleccion[config.get('reemplazo').get('metodo3')](poblacion=poblacion_k_mas_n, n=math.floor(n * B),
                                                              generacion=generacion_actual)
-                    + metodos_seleccion[config.get('metodo4')](poblacion=poblacion_k_mas_n, n=n - math.floor(n * B),
+                    + metodos_seleccion[config.get('reemplazo').get('metodo4')](poblacion=poblacion_k_mas_n, n=n - math.floor(n * B),
                                                                generacion=generacion_actual))
         else:
             if K >= n:
                 poblacion_actual = (
-                        metodos_seleccion[config.get('metodo3')](poblacion=hijos, size=math.floor(n * B))
-                        + metodos_seleccion[config.get('metodo4')](poblacion=hijos,
+                        metodos_seleccion[config.get('reemplazo').get('metodo3')](poblacion=hijos, size=math.floor(n * B))
+                        + metodos_seleccion[config.get('reemplazo').get('metodo4')](poblacion=hijos,
                                                                    n=n - math.floor(n * B),
                                                                    generacion=generacion_actual))
             else:
                 poblacion_actual = hijos + (
-                        metodos_seleccion[config.get('metodo3')](poblacion=poblacion_actual,
+                        metodos_seleccion[config.get('reemplazo').get('metodo3')](poblacion=poblacion_actual,
                                                                  n=math.floor((n - K) * B),
                                                                  generacion=generacion_actual)
-                        + metodos_seleccion[config.get('metodo4')](poblacion=poblacion_actual,
+                        + metodos_seleccion[config.get('reemplazo').get('metodo4')](poblacion=poblacion_actual,
                                                                    n=(n - K) - math.floor((n - K) * B),
                                                                    generacion=generacion_actual))
         generacion_actual += 1

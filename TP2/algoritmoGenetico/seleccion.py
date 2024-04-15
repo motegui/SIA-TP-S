@@ -54,7 +54,8 @@ def universal(poblacion, n, generacion):
     return nueva_poblacion
 
 
-TORNEO_DETERMINISTICO_MUESTRA = config.get('seleccion').get('TORNEO_DETERMINISTICO_MUESTRA')
+TORNEO_DETERMINISTICO_MUESTRA = config.get('seleccion').get('torneo_deterministico').get('muestra')
+
 
 def torneo_deterministico(poblacion, n, generacion):
     nueva_poblacion = []
@@ -64,7 +65,7 @@ def torneo_deterministico(poblacion, n, generacion):
     return nueva_poblacion
 
 
-TORNEO_PROBABILISTICO_THRESHOLD = config.get('seleccion').get('TORNEO_PROBABILISTICO_THRESHOLD')
+TORNEO_PROBABILISTICO_THRESHOLD = config.get('seleccion').get('torneo_probabilistico').get('threshold')
 
 
 def torneo_probabilistico(poblacion, n, generacion):
@@ -103,9 +104,9 @@ def ruleta_pseudo_aptitud(poblacion, aptitudes, n):
 
 # gen es el nro de generacion
 def __temperatura(gen):
-    T_C = config.get('T_C')
-    T_0 = config.get('T_0')
-    T_K = config.get('T_K')
+    T_C = config.get('seleccion').get('boltzmann').get('T_C')
+    T_0 = config.get('seleccion').get('boltzmann').get('T_0')
+    T_K = config.get('seleccion').get('boltzmann').get('T_K')
     return T_C + (T_0 - T_C) * math.exp(-T_K * gen)
 
 
@@ -121,6 +122,6 @@ def ranking(poblacion, n, generacion):
     poblacion_ordenada = sorted(poblacion, key=lambda x: x.fitness, reverse=True)
     tamano = len(poblacion_ordenada)
     pseudo_aptitud = []
-    for i, _ in enumerate(poblacion_ordenada):
-        pseudo_aptitud.append((tamano-i+1)/tamano)
-    return ruleta_pseudo_aptitud(poblacion, pseudo_aptitud, n)
+    for i in range(0, tamano):
+        pseudo_aptitud.append((tamano - i + 1) / tamano)
+    return ruleta_pseudo_aptitud(poblacion_ordenada, pseudo_aptitud, n)

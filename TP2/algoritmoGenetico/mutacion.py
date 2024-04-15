@@ -3,9 +3,8 @@ from TP2.player.player import *
 
 from TP2.config import config
 
-PROBABILIDAD_MUTACION = config.get('probabilidad_mutacion')
 
-RANGO = config['rango']
+RANGO = config['mutacion']['rango']
 
 
 def gen(cromosoma, probabilidad_mutacion):
