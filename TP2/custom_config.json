@@ -1,18 +1,18 @@
 {
     "clase": "GUERRERO",
-    "n": 25,
-    "K": 20,
+    "n": 60,
+    "K": 30,
     "A": 0.5,
     "B": 0.5,
-    "metodo1": "ruleta",
-    "metodo2": "ruleta",
+    "metodo1": "ranking",
+    "metodo2": "ranking",
     "metodo3": "ruleta",
     "metodo4": "determinista",
     "condicion_corte": {
         "tipo": "estructura",
         "MAX_FITNESS": 50,
-        "GENERACIONES_IGUALES": 0.7,
-        "GENERACIONES_SIN_CAMBIO": 3,
+        "GENERACIONES_IGUALES": 0.8,
+        "GENERACIONES_SIN_CAMBIO": 50,
         "GENERACIONES_IGUAL_FITNESS": 6,
         "MAX_GENERACION": 15
     },
@@ -23,16 +23,16 @@
     "cruce": {
         "probabilidadUniforme": 0.6
     },
-    "probabilidad_mutacion": 0.5,
-    "metodo_mutacion_uniforme": "limitada",
+    "probabilidad_mutacion": 0.6,
+    "metodo_mutacion_uniforme": "gen",
     "rango": {
         "min": 0.5,
         "max": 1.5
     },
-    "favorecer_jovenes": true,
+    "favorecer_jovenes": false,
     "metodo_cruce": "un_punto",
     "funcion_no_uniforme": null,
-    "factor": 0.01,
+    "factor": 0.03,
     "T_C": 5,
     "T_0": 10,
     "T_K": 2

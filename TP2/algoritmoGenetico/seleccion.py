@@ -119,6 +119,8 @@ def boltzmann(poblacion, n, generacion):
 def ranking(poblacion, n, generacion):
     # primero ordeno la poblacion segun su fitness de mayor a menor
     poblacion_ordenada = sorted(poblacion, key=lambda x: x.fitness, reverse=True)
-    max_fitness = poblacion_ordenada[0].fitness
-    pseudo_aptitud = [(max_fitness - p.fitness) / max_fitness for p in poblacion_ordenada]
+    tamano = len(poblacion_ordenada)
+    pseudo_aptitud = []
+    for i, _ in enumerate(poblacion_ordenada):
+        pseudo_aptitud.append((tamano-i+1)/tamano)
     return ruleta_pseudo_aptitud(poblacion, pseudo_aptitud, n)
