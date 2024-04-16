@@ -34,6 +34,15 @@ class Player:
         return (
                     self.equipamiento.resistencia_p() + self.equipamiento.pericia_p()) * self.equipamiento.vida_p() * self.__DEM()
 
+    def __str__(self):
+        return ("Clase: " + str(self.clase)
+                + " Fitness: " + str(self.fitness)
+                + " Altura: " + str(self.altura)
+                + " Fuerza: " + str(self.cromosoma[FUERZA])
+                + " Agilidad: " + str(self.cromosoma[AGILIDAD]) + " Pericia: " + str(self.cromosoma[PERICIA])
+                + " Resistencia: " + str(self.cromosoma[RESISTENCIA])
+                + " Vida: " + str(self.cromosoma[VIDA]))
+
 
 def generar_cromosoma():
     puntos_totales = 150
