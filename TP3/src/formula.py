@@ -6,11 +6,13 @@ def __feed_perceptron():
     input_data = [[-1, 1], [-1, -1], [1, 1], [1, -1]]
     expected_output = [-1, -1, 1, -1]
     t = staggered_perceptron(input_data, expected_output, random_initialize_weight, compute_error, 1000, 0.1)
+    print('error del and', t[1])
     # XOR 1 1
     input_data2 = [[-1, 1], [-1, -1], [1, 1], [1, -1]]
     expected_output2 = [1, -1, -1, 1]
     t2 = staggered_perceptron(input_data2, expected_output2, random_initialize_weight, compute_error, 30, 0.1)
-    print(t2[1])
+    print('w xor', t2[0])
+    print('error del xor', t2[1])
     return [t[0], t2[0]]
 
 
@@ -67,7 +69,6 @@ def __evaluate_formula(tree, w_and, w_xor):
 def evaluate_formula(formula):
     [w_and, w_xor] = __feed_perceptron()
     print(w_xor)
-
     tree = __build_tree(formula)
     val = __evaluate_formula(tree, w_and, w_xor)
     return True if val >= 0 else False
