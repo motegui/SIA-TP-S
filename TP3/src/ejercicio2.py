@@ -2,57 +2,40 @@ import numpy as np
 
 from utils import *
 import pandas as pd
-
+from normalization import *
 
 def main():
-    TRAINING_SIZE = 15
+    df = pd.read_csv('/Users/pazaramburu/Desktop/SIA-TP-S/TP3/data/TP3-ej2-conjunto.csv')
 
-    df = pd.read_csv('/Users/motegui/Documents/GitHub/SIA-TP-S/TP3/data/TP3-ej2-conjunto.csv')
-
-    x_values_train = df[['x1', 'x2', 'x3']].values
-    y_values_train = df['y'].values
+    x_values = df[['x1', 'x2', 'x3']].values
+    y_values = df['y'].values
 
     # Normalizar los datos entre -1 y 1 utilizando la interpolación de NumPy
-    x_values_train_normalized = np.interp(x_values_train, (x_values_train.min(), x_values_train.max()), (0, 1)).tolist()
-    y_values_train_normalized = np.interp(y_values_train, (y_values_train.min(), y_values_train.max()), (0, 1)).tolist()
+    x_min = x_values.min()
+    x_max = x_values.max()
+    y_min = y_values.min()
+    y_max = y_values.max()
+    # x_values_normalized = np.interp(x_values, (x_min, x_max), (-1, 1)).tolist()
+    x_values = x_values.tolist()
+    y_values_normalized = normalize(y_values, 0, 1)
 
-    # x_values_train = np.array(x_values[:])
-    # y_values_train = np.array(y_values[:])
+    split_index = int(len(x_values) * 0.8)  # 80% de los datos para train
+    x_train, x_test = x_values[:split_index], x_values[split_index:]
+    y_train, y_test = y_values_normalized[:split_index], y_values_normalized[split_index:]
 
-    # [w, err] = lineal_nonlineal_perceptron(x_values_train, y_values_train, random_initialize_weight, compute_error, 10000,
-    #                                        0.02,
-    #                                        0, lineal_theta, lineal_prime_theta)
+    #entrenamos el perceptron
+    [w, err_train] = lineal_nonlineal_perceptron(x_train, y_train, random_initialize_weight, compute_error_nonlinear,
+                                                 10000, 0.01, 0, logistic_theta, logistic_prime_theta,
+                                                 [y_min, y_max])
 
-    # El error dio muy alto por lo que no es lineal. A medida que agrandamos el training size da mas alto el error
-    # normalized_data = np.interp(data, (min_val, max_val), (new_min, new_max))
-    # normalized_data = np.interp(x_values_train, (min(x_values_train), max(x_values_train)), (-1, 1))
+    # rendimiento en conjunto train -> capacidad de aprendizaje
+    print('Error en el conjunto de entrenamiento:', err_train)
 
-    randomNum1 = random.randint(0, len(x_values_train_normalized)-1)
-    randomNum2 = random.randint(0, len(x_values_train_normalized)-1)
-    randomNum3 = random.randint(0, len(x_values_train_normalized)-1)
-
-    test_X = [x_values_train_normalized[randomNum1], x_values_train_normalized[randomNum2], x_values_train_normalized[randomNum3]]
-    test_y = [y_values_train_normalized[randomNum1], y_values_train_normalized[randomNum2], y_values_train_normalized[randomNum3]]
-
-    [w, err] = lineal_nonlineal_perceptron(test_X,
-                                           test_y,
-                                           random_initialize_weight, compute_error,
-                                           100,
-                                           0.1,
-                                           0, logistic_theta, logistic_prime_theta)
-
-    print('error is: ', err)
-
-    # x_values_train = x_values[TRAINING_SIZE:]
-    # y_values_train = y_values[TRAINING_SIZE:]
-
-
-
-    for x, y in zip(x_values_train_normalized,
-                    y_values_train_normalized):
-        print(sum(np.multiply(w, [1] + x) - y))
+    # rendimiento en el conjunto de prueba -> capacidad de generalizacion
+    y_test = denormalize(y_test, y_min, y_max)
+    err_test = test_error([x_test, y_test], w, logistic_theta, [y_min, y_max])
+    print('Error en el conjunto de prueba:', err_test)
 
 
 if __name__ == '__main__':
     main()
-
