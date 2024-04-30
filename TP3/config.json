@@ -1,0 +1,12 @@
+{
+  "beta": 1,
+  "epsilon": 0,
+  "theta": {
+    "name": "logistic",
+    "miny": 0,
+    "maxy": 1
+  },
+  "step": 0.01,
+  "limit": 20000,
+  "K": 5
+}
