@@ -43,3 +43,4 @@ def staggered_perceptron(input_data, expected_output, initialize_weight, compute
             w_min = w.copy()
         i += 1
     return w_min, min_error
+

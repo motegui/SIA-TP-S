@@ -27,3 +27,5 @@ def test_error(data, w, theta, min_max=None):
 def real_output(input_data, w, theta):
     t = [theta(sum(np.multiply([1] + x, w))) for x in input_data]
     return t
+
+
