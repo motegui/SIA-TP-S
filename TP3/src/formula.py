@@ -1,16 +1,18 @@
+from TP3.src.perceptron import staggered_perceptron
 from utils import *
+from theta_functions import thetas
 
 
 def __feed_perceptron():
     # AND
     input_data = [[-1, 1], [-1, -1], [1, 1], [1, -1]]
     expected_output = [-1, -1, 1, -1]
-    t = staggered_perceptron(input_data, expected_output, random_initialize_weight, compute_error, 1000, 0.1)
+    t = staggered_perceptron(input_data, expected_output, random_initialize_weight, compute_error, 1000, 0.1, thetas.get("staggered"))
     print('error del and', t[1])
     # XOR 1 1
     input_data2 = [[-1, 1], [-1, -1], [1, 1], [1, -1]]
     expected_output2 = [1, -1, -1, 1]
-    t2 = staggered_perceptron(input_data2, expected_output2, random_initialize_weight, compute_error, 30, 0.1)
+    t2 = staggered_perceptron(input_data2, expected_output2, random_initialize_weight, compute_error, 30, 0.1, thetas.get("staggered"))
     print('w xor', t2[0])
     print('error del xor', t2[1])
     return [t[0], t2[0]]
