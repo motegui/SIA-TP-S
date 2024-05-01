@@ -2,7 +2,7 @@
   "beta": 1,
   "epsilon": 0,
   "theta": {
-    "name": "logistic",
+    "name": "lineal",
     "miny": 0,
     "maxy": 1
   },
