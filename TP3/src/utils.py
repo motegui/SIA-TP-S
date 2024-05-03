@@ -12,6 +12,17 @@ def compute_error(data, w, theta):
     return 0.5 * t
 
 
+def compute_error_multilayer(data, network):
+    input_data = data[0]
+    expected_output = data[1]
+    errors = []
+    for input in input_data:
+        for result in expected_output:
+            forward = network.updated_forward_propagation(input)
+            errors.append(sum(np.square(np.array(forward) - np.array(result))))
+    return sum(errors) * 0.5
+
+
 def test_error(data, w, theta, min_max=None):
     input_data, expected_output = data
     predicted_output = real_output(input_data, w, theta)
@@ -27,6 +38,3 @@ def test_error(data, w, theta, min_max=None):
 def real_output(input_data, w, theta):
     t = [theta(sum(np.multiply([1] + x, w))) for x in input_data]
     return t
-
-
-
