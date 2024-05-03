@@ -3,17 +3,15 @@ import numpy as np
 
 class Neuron:
 
-    def __init__(self, theta, prime_theta, weights):
+    def __init__(self, theta, prime_theta, weights=None):
         self.delta = None
         self.theta = theta
         self.prime_theta = prime_theta
         self.weights = weights
         self.inputs = []
 
-    def compute_excitement(self):
-        if self.inputs is None:
-            return None
-        return sum(np.multiply(self.inputs, self.weights))
+    def compute_output(self):
+        return self.theta(sum(np.multiply(self.inputs, self.weights)))
 
     def set_inputs(self, inputs):
         self.inputs = [1] + inputs

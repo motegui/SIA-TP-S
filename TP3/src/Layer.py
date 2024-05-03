@@ -11,10 +11,13 @@ class Layer:
         out = []
         for neuron in self.neurons:
             neuron.set_inputs(inputs)
-            out.append(neuron.compute_excitement())
+            out.append(neuron.compute_output())
         return out
 
-    def populate_weights(self):
+    def populate_weights(self, input_values=None):
         for neuron in self.neurons:
-            weights = random_initialize_weight(len(self.prev_layer.neurons))
-            neuron.set_weights(weights)  # aca hay que agregar el bias?
+            if self.prev_layer is None:
+                weights = random_initialize_weight(len(input_values)-1)
+            else:
+                weights = random_initialize_weight(len(self.prev_layer.neurons)-1)
+            neuron.set_weights([0] + weights)  # aca hay que agregar el bias?

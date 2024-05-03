@@ -29,7 +29,10 @@ def real_output(input_data, w, theta):
     return t
 
 
-def forward_propagation(layers, input_data):
+def forward_propagation(layer0, input_data):
     inputs = input_data
-    for layer in layers:
+    layer = layer0
+    while layer is not None:
         inputs = layer.forward(inputs)
+        layer = layer.next_layer
+    print(inputs)
