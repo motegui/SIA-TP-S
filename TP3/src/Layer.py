@@ -16,7 +16,7 @@ class Layer:
     def updated_forward(self, inputs):
         out = []
         for neuron in self.neurons:
-            neuron.set_inputs(inputs)
+            neuron.set_inputs([1] + inputs)
             out.append(neuron.compute_updated_output())
         return out
 

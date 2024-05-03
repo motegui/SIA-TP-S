@@ -17,8 +17,7 @@ class Neuron:
         return self.theta(sum(np.multiply(self.inputs, self.weights)))
 
     def compute_updated_output(self):
-        return self.theta(sum(np.multiply(self.inputs, np.array(self.weights[1:]) + np.array(self.delta_w))))
-
+        return self.theta(sum(np.multiply(self.inputs, np.array(self.weights) + np.array([0] + self.delta_w))))
 
     def compute_excitement(self):
         return sum(np.multiply(self.inputs, self.weights))
@@ -38,7 +37,7 @@ class Neuron:
         return self.delta
 
     def update_weights(self):
-        self.weights = np.array(self.weights) + np.array([0]+self.delta_w)
+        self.weights = np.array(self.weights) + np.array([0] + self.delta_w)
 
     def __str__(self):
         # return str(str(self.weights), str(self.inputs), str(self.delta))
