@@ -33,14 +33,14 @@ class Network:
             if i == len(self.layers) - 1:
                 #  calcular deltas de la primera capa. -> funcion distinta
                 for j in range(len(layer.neurons)):
-                    layer.neurons[j].delta = np.multiply(expected_output[j] - forward_output[j],
-                                                         layer.neurons[j].prime_theta(
-                                                             layer.neurons[j].compute_excitement()))
-                    layer.neurons[j].delta_w = [gradient_descend(config.get("step"), layer.neurons[j].delta, value) for
-                                                value in layer.neurons[j].inputs[1:]]
+                    t = layer.neurons[j].compute_excitement()
+                    op = expected_output[j] - forward_output[j]
+                    layer.neurons[j].delta = np.multiply(op, layer.neurons[j].prime_theta(t))
+                    layer.neurons[j].delta_w = gradient_descend(config.get("step"), layer.neurons[j].delta,
+                                                                layer.neurons[j].inputs[1:])
                     prev_deltas.append(layer.neurons[j].delta)
             else:
-                #calcular delta -> funcion norma
+                # calcular delta -> funcion norma
                 connected_weights = self.layers[i + 1].get_weights()
                 prev_deltas = layer.compute_deltas(prev_deltas, connected_weights)
 
@@ -50,7 +50,6 @@ class Network:
     def update_layer_weights(self):
         for layer in self.layers:
             layer.update_neuron_weights()
-
 
 
 def layer_n_neurons(neuron_count, theta, prime_theta):

@@ -13,14 +13,15 @@ def main():
     network = Network([layer1, layer2, layer3, layer4])
 
     network.initialize(input_count=2)
+    print(network)
     input_data = [[1, 1], [1, -1], [-1, 1], [-1, -1]]
     output_data = [[-1], [1], [1], [-1]]
-    error = multilayer_perceptron(input_data, output_data, compute_error_multilayer, 1000, 0.1, network)
+    error = multilayer_perceptron(input_data, output_data, compute_error_multilayer, 20000, 0.1, network)
 
     print(error)
 
     print(network.forward_propagation([1, 1]))
-    print(network.forward_propagation([1, -1]))
+    print(network.forward_propagation([-1, -1]))
 
     print(network)
 

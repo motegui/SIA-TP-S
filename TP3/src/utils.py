@@ -16,10 +16,11 @@ def compute_error_multilayer(data, network):
     input_data = data[0]
     expected_output = data[1]
     errors = []
-    for input in input_data:
-        for result in expected_output:
-            forward = network.updated_forward_propagation(input)
-            errors.append(sum(np.square(np.array(forward) - np.array(result))))
+    for i in range(len(input_data)):
+        forward = network.updated_forward_propagation(input_data[i])
+        t = np.square(np.array(forward) - np.array(expected_output[i]))
+
+        errors.append(sum(t))
     return sum(errors) * 0.5
 
 
