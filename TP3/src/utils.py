@@ -39,3 +39,50 @@ def test_error(data, w, theta, min_max=None):
 def real_output(input_data, w, theta):
     t = [theta(sum(np.multiply([1] + x, w))) for x in input_data]
     return t
+
+
+def create_numbers_with_noise(clean_numbers, qty_by_number):
+    numbers_with_noise = []
+    results = []
+    for i, number in enumerate(clean_numbers):
+        for _ in range(qty_by_number):
+            clean_matrix = np.array(number.split(), dtype=int).reshape(5, 7)
+            noise = np.random.normal(0, 0.3, (5, 7))  # Gaussian noise with mean 0 and standard deviation 0.1
+            matrix_with_noise = clean_matrix + noise
+            matrix_with_noise = (matrix_with_noise >= 0.5).astype(int)  # Convert values >= 0.5 to 1, otherwise to 0
+            numbers_with_noise.append(matrix_with_noise.flatten())
+            results.append(i)
+    return [numbers_with_noise, results]
+
+
+def get_expected_output():
+    results = []
+    for i in range(0, 10):
+        out = [0] * 10
+        out[i] = 1
+        results.append(out)
+    return results
+
+
+def get_clean_matrix(clean_numbers):
+    result = []
+    for number in clean_numbers:
+        result.append(np.array(number.split(), dtype=int).reshape(5, 7).flatten().tolist())
+    return result
+
+
+def transform_csv_to_list(csv_file):
+    with open(csv_file, 'r') as file:
+        lines = file.readlines()
+
+    groups = []
+    current_group = []
+    for line in lines:
+        line = line.strip()  # Remove leading and trailing whitespace
+        if line:
+            current_group.append(line)
+            if len(current_group) == 7:
+                groups.append('\n'.join(current_group))
+                current_group = []
+
+    return groups

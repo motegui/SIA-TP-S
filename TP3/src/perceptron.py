@@ -54,7 +54,9 @@ def multilayer_perceptron(input_data, expected_output, compute_error_function, l
         compute_activation = network.forward_propagation(x)
         network.back_propagation(compute_activation, expected_output[u])  # me modifica los delta w
         error = compute_error_function([input_data, expected_output], network)
+
         if error < min_error:
+            print(error)
             min_error = error
             network.update_layer_weights()
         i += 1
