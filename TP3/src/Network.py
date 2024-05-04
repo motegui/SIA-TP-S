@@ -37,7 +37,7 @@ class Network:
                     op = expected_output[j] - forward_output[j]
                     layer.neurons[j].delta = np.multiply(op, layer.neurons[j].prime_theta(t))
                     layer.neurons[j].delta_w = gradient_descend(config.get("step"), layer.neurons[j].delta,
-                                                                layer.neurons[j].inputs[1:])
+                                                                layer.neurons[j].inputs)
                     prev_deltas.append(layer.neurons[j].delta)
             else:
                 # calcular delta -> funcion norma

@@ -18,7 +18,7 @@ class Neuron:
         return self.theta(sum(t))
 
     def compute_updated_output(self):
-        return self.theta(sum(np.multiply(self.inputs, np.array(self.weights) + np.array([0] + self.delta_w))))
+        return self.theta(sum(np.multiply(self.inputs, np.array(self.weights) + np.array(self.delta_w))))
 
     def compute_excitement(self):
         t = np.multiply(self.inputs, self.weights)
@@ -35,11 +35,11 @@ class Neuron:
 
     def compute_delta(self, prev_deltas, connected_weights):
         self.delta = sum(np.multiply(prev_deltas, connected_weights)) * self.prime_theta(self.compute_excitement())
-        self.delta_w = gradient_descend(config.get("step"), self.delta, self.inputs[1:])
+        self.delta_w = gradient_descend(config.get("step"), self.delta, self.inputs)
         return self.delta
 
     def update_weights(self):
-        self.weights = np.array(self.weights) + np.array([0] + self.delta_w)
+        self.weights = np.array(self.weights) + np.array(self.delta_w)
 
     def __str__(self):
         # return str(str(self.weights), str(self.inputs), str(self.delta))
