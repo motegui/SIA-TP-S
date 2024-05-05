@@ -35,7 +35,7 @@ class Neuron:
 
     def compute_delta(self, prev_deltas, connected_weights):
         self.delta = sum(np.multiply(prev_deltas, connected_weights)) * self.prime_theta(self.compute_excitement())
-        self.delta_w = optimizers.get(config.get("optimizer"))(config.get("step"), self)
+        self.delta_w += optimizers.get(config.get("optimizer"))(config.get("step"), self)
         return self.delta
 
     def update_weights(self):

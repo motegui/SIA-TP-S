@@ -24,6 +24,8 @@ class Layer:
         for neuron in self.neurons:
             weights = random_initialize_weight(input_count-1)
             neuron.set_weights([0] + weights)  # aca hay que agregar el bias
+            neuron.delta_w = np.zeros(len(neuron.weights))
+
 
     def get_weights(self):
         return [neuron.weights for neuron in self.neurons]
@@ -39,6 +41,7 @@ class Layer:
     def update_neuron_weights(self):
         for neuron in self.neurons:
             neuron.update_weights()
+            neuron.delta_w = np.zeros(len(neuron.weights))
 
     def __str__(self):
         return '\n'.join([str(neuron) for neuron in self.neurons])
