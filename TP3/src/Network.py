@@ -2,6 +2,7 @@ import numpy as np
 
 from Neuron import *
 from Layer import *
+from TP3.config import config
 
 
 class Network:
@@ -36,8 +37,10 @@ class Network:
                     t = layer.neurons[j].compute_excitement()
                     op = expected_output[j] - forward_output[j]
                     layer.neurons[j].delta = np.multiply(op, layer.neurons[j].prime_theta(t))
-                    layer.neurons[j].delta_w = gradient_descend(config.get("step"), layer.neurons[j].delta,
-                                                                layer.neurons[j].inputs)
+                    # layer.neurons[j].delta_w = gradient_descend(config.get("step"), layer.neurons[j].delta,
+                    #                                             layer.neurons[j].inputs)
+                    layer.neurons[j].delta_w = optimizers.get(config.get("optimizer"))(config.get("step"),
+                                                                                       layer.neurons[j])
                     prev_deltas.append(layer.neurons[j].delta)
             else:
                 # calcular delta -> funcion norma
@@ -84,4 +87,3 @@ def create_weighted_network(weights, theta, prime_theta):
             neurons.append(Neuron(weights=neuron_weights, theta=theta, prime_theta=prime_theta))
         layers.append(Layer(neurons))
     return Network(layers)
-
