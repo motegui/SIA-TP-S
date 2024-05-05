@@ -46,6 +46,8 @@ def lineal_nonlineal_perceptron(input_data, expected_output, initialize_weight, 
 
 
 def multilayer_perceptron(input_data, expected_output, compute_error_function, limit, epsilon, network):
+    if limit == 0:
+        limit = math.inf
     i = 0
     min_error = math.inf
     while min_error > epsilon and i < limit:

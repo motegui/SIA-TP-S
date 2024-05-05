@@ -86,3 +86,6 @@ def transform_csv_to_list(csv_file):
                 current_group = []
 
     return groups
+
+
+def de_numppy(array): {}
