@@ -40,8 +40,8 @@ def main():
     network.initialize(input_count=35)
     input_data = get_clean_matrix(clean_numbers)
     error = multilayer_perceptron(input_data, expected_output, compute_error_multilayer, 0, 0.05, network)
-    print(network.get_weights())
-    print(error)
+    # print(network.get_weights())
+    # print(error)
 
     # network = create_weighted_network([[[-0.980637623652979, -0.9927666879125988, 1.106559197252621,
     #                                      -0.5124464078897945, -1.931725839279701, -1.2630612292819454,
@@ -204,6 +204,7 @@ def main():
     # network.initialize(35)
 
     noise_data = create_numbers_with_noise(clean_numbers, 3)
+    print(noise_data[0][2].tolist())
 
     print(network.forward_propagation(noise_data[0][2].tolist()))
 

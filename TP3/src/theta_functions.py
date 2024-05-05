@@ -24,7 +24,6 @@ def hyp_tan_theta(value):
 
 def hyp_tan_prime_theta(value):
     return BETA * (1 - np.square(hyp_tan_theta(value)))
-    # return BETA * (1 - np.square(np.tanh(value))) todo por si quieren fijarse si asi anda!
 
 
 def logistic_theta(value):

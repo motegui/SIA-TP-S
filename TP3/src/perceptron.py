@@ -2,6 +2,7 @@ import math
 import random
 import numpy as np
 from TP3.config import config
+import csv
 
 
 def staggered_perceptron(input_data, expected_output, initialize_weight, compute_error_function, limit, step, theta):
@@ -53,15 +54,21 @@ def multilayer_perceptron(input_data, expected_output, compute_error_function, l
     min_error = math.inf
     batch_size = config.get('batch_size')
     while min_error > epsilon and i < limit:
+        input_copy = input_data.copy()
         for _ in range(batch_size):
-            u = random.randint(0, len(input_data) - 1)  # online
-            x = input_data[u]
+            u = random.randint(0, len(input_copy) - 1)
+            x = input_copy[u]
             compute_activation = network.forward_propagation(x)
             network.back_propagation(compute_activation, expected_output[u])  # me modifica los delta w
+            input_copy.remove(x)
         error = compute_error_function([input_data, expected_output], network)
+
+        # ACA!
+        print(error)
+
         if error < min_error:
-            print(error)
             min_error = error
             network.update_layer_weights()
         i += 1
     return min_error
+

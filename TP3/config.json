@@ -6,9 +6,9 @@
     "miny": 0,
     "maxy": 1
   },
-  "step": 0.1,
+  "step": 0.02,
   "limit": 20000,
   "K": 5,
   "optimizer": "gradient_descend",
-  "batch_size": 5
+  "batch_size": 3
 }
