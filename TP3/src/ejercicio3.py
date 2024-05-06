@@ -2,7 +2,7 @@ from Neuron import *
 from Layer import *
 from theta_functions import *
 from Network import *
-from perceptron import multilayer_perceptron
+from perceptron import *
 
 
 def main():
@@ -39,7 +39,8 @@ def main():
     network = Network([layer1, layer2])
     network.initialize(input_count=35)
     input_data = get_clean_matrix(clean_numbers)
-    error = multilayer_perceptron(input_data, expected_output, compute_error_multilayer, 0, 0.3, network)
+
+    error = multilayer_perceptron(input_data, expected_output, compute_error_multilayer, 0, 0.05, network)
     # print(network.get_weights())
     # print(error)
 

@@ -3,6 +3,7 @@ import random
 import numpy as np
 from TP3.config import config
 import csv
+import os
 
 
 def staggered_perceptron(input_data, expected_output, initialize_weight, compute_error_function, limit, step, theta):
@@ -19,6 +20,8 @@ def staggered_perceptron(input_data, expected_output, initialize_weight, compute
         delta_w = np.multiply(step * (expected_output[u] - o), x)
         w += delta_w
         error = compute_error_function([input_data, expected_output], w, theta)
+        print_to_CSV('staggered_perceptron_errors.csv', error)
+
         if error < min_error:
             min_error = error
             w_min = w.copy()
@@ -40,6 +43,8 @@ def lineal_nonlineal_perceptron(input_data, expected_output, initialize_weight, 
         delta_w = np.multiply(step * (expected_output[u] - o) * theta_prime(h), x)
         w += delta_w
         error = compute_error_function([input_data, expected_output], w, theta)
+        print_to_CSV('lineal_nonlineal_perceptron_errors.csv', error)
+
         if error < min_error:
             min_error = error
             w_min = w.copy()
@@ -53,6 +58,10 @@ def multilayer_perceptron(input_data, expected_output, compute_error_function, l
     i = 0
     min_error = math.inf
     batch_size = config.get('batch_size')
+    csv_path = 'staggered_perceptron_errors.csv'
+    # Eliminar el archivo si existe antes de comenzar las iteraciones
+    if os.path.exists(csv_path):
+        os.remove(csv_path)
     while min_error > epsilon and i < limit:
         input_copy = input_data.copy()
         expected_copy = expected_output.copy()
@@ -66,9 +75,22 @@ def multilayer_perceptron(input_data, expected_output, compute_error_function, l
             expected_copy.remove(exp)
         error = compute_error_function([input_data, expected_output], network)
 
+        print_to_CSV('multilayer_perceptron_errors.csv', error)
+
         if error < min_error:
             print(error)
             min_error = error
             network.update_layer_weights()
         i += 1
     return min_error
+
+
+
+
+def print_to_CSV(file_path, error):
+
+    # Escribir el nuevo error en el archivo CSV
+    with open(file_path, mode='a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([error])
+
