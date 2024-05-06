@@ -28,7 +28,7 @@ def main():
     print('----------------------------------------------------')
     # excercise 3.c
 
-    csv_file = '/Users/motegui/Documents/GitHub/SIA-TP-S/TP3/data/TP3-ej3-digitos.txt'
+    csv_file = '/Users/pazaramburu/Desktop/SIA-TP-S/TP3/data/TP3-ej3-digitos.txt'
     clean_numbers = transform_csv_to_list(csv_file)
     expected_output = get_expected_output()
 
@@ -39,7 +39,7 @@ def main():
     network = Network([layer1, layer2])
     network.initialize(input_count=35)
     input_data = get_clean_matrix(clean_numbers)
-    error = multilayer_perceptron(input_data, expected_output, compute_error_multilayer, 0, 0.05, network)
+    error = multilayer_perceptron(input_data, expected_output, compute_error_multilayer, 0, 0.3, network)
     # print(network.get_weights())
     # print(error)
 
@@ -206,7 +206,7 @@ def main():
     noise_data = create_numbers_with_noise(clean_numbers, 3)
     print(noise_data[0][2].tolist())
 
-    print(network.forward_propagation(noise_data[0][2].tolist()))
+    print(network.forward_propagation(noise_data[0][8].tolist()))
 
     # testing
     # print(network.forward_propagation(noise_data[0][0].tolist()))

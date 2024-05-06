@@ -88,4 +88,5 @@ def transform_csv_to_list(csv_file):
     return groups
 
 
-def de_numppy(array): {}
+def test_network(network, data):
+

@@ -10,5 +10,5 @@
   "limit": 20000,
   "K": 5,
   "optimizer": "gradient_descend",
-  "batch_size": 3
+  "batch_size": 10
 }
