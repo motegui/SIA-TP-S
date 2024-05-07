@@ -1,8 +1,6 @@
 import copy
 
-from TP3.config import config
-from TP3.src.Network import layer_n_neurons, Network
-from TP3.src.metrics import test_network, even_test
+from TP3.src.metrics import test_network
 from TP3.src.perceptron import *
 from TP3.src.utils import *
 
@@ -52,7 +50,7 @@ def kfold_cross_validation(data, theta, prime_theta, k):
     return [error_training_set, error_testing_set]
 
 
-def kfold_cross_validation_multilayer(data, network, input_count, k):
+def kfold_cross_validation_multilayer(data, network, input_count, k, metrics_test):
     n = len(data[0])
     avg_size = n // k
     remainder = n % k
@@ -85,7 +83,7 @@ def kfold_cross_validation_multilayer(data, network, input_count, k):
         x_test = splitted_x[fold]
         y_test = splitted_y[fold]
 
-        print(test_network(network_k, [x_test, y_test], even_test))
+        print(test_network(network_k, [x_test, 0, [np.argmax(t) for t in y_test]], metrics_test))
 
     return [error_training_set, error_testing_set]
 
