@@ -20,7 +20,7 @@ def staggered_perceptron(input_data, expected_output, initialize_weight, compute
         delta_w = np.multiply(step * (expected_output[u] - o), x)
         w += delta_w
         error = compute_error_function([input_data, expected_output], w, theta)
-        print_to_CSV('staggered_perceptron_errors.csv', error)
+        print_to_CSV('staggered_perceptron_errors.csv', error, i)
 
         if error < min_error:
             min_error = error
@@ -70,12 +70,12 @@ def multilayer_perceptron(input_data, expected_output, compute_error_function, l
             x = input_copy[u]
             exp = expected_copy[u]
             compute_activation = network.forward_propagation(x)
-            network.back_propagation(compute_activation, exp)  # me modifica los delta w
+            network.back_propagation(compute_activation, exp, i)  # me modifica los delta w
             input_copy.remove(x)
             expected_copy.remove(exp)
         error = compute_error_function([input_data, expected_output], network)
 
-        print_to_CSV('multilayer_perceptron_errors.csv', error)
+        print_to_CSV('multilayer_perceptron_errors.csv', error, i)
 
         if error < min_error:
             print(error)
@@ -85,12 +85,8 @@ def multilayer_perceptron(input_data, expected_output, compute_error_function, l
     return min_error
 
 
-
-
-def print_to_CSV(file_path, error):
-
+def print_to_CSV(file_path, error, epoch):
     # Escribir el nuevo error en el archivo CSV
     with open(file_path, mode='a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow([error])
-
+        writer.writerow([epoch, error])

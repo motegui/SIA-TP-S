@@ -1,3 +1,4 @@
+from TP3.config import config
 from utils import *
 
 
@@ -22,19 +23,23 @@ class Layer:
 
     def populate_weights(self, input_count=None):
         for neuron in self.neurons:
-            weights = random_initialize_weight(input_count-1)
-            neuron.set_weights([0] + weights)  # aca hay que agregar el bias
-            neuron.delta_w = np.zeros(len(neuron.weights))
+            weights = random_initialize_weight(input_count)
+            neuron.set_weights(weights)  # aca hay que agregar el bias
+            neuron.delta_w = np.zeros_like(neuron.weights)
+            neuron.m = np.zeros_like(neuron.weights)
+            neuron.v = np.zeros_like(neuron.weights)
+
 
 
     def get_weights(self):
         return [neuron.weights for neuron in self.neurons]
 
-    def compute_deltas(self, prev_deltas, connected_weights):  # connected_weights es un vector de vectores y para neurona_i uso connected_i
+    def compute_deltas(self, prev_deltas, connected_weights, epoch):  # connected_weights es un vector de vectores y para neurona_i uso connected_i
         deltas = []
         for i in range(len(self.neurons)):
-            self.neurons[i].compute_delta(prev_deltas,
-                                          np.array(connected_weights)[:, i + 1])  # TODO ESTAMOS SACANDO EL VIAS
+            self.neurons[i].compute_delta(prev_deltas, np.array(connected_weights)[:, i + 1])
+            if config.get("optimizer") == "adam":
+                self.neurons[i].adam(epoch)
             deltas.append(self.neurons[i].delta)
         return deltas
 

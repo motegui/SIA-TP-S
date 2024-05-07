@@ -51,11 +51,13 @@ def create_numbers_with_noise(clean_numbers, qty_by_number):
             matrix_with_noise = clean_matrix + noise
             matrix_with_noise = (matrix_with_noise >= 0.5).astype(int)  # Convert values >= 0.5 to 1, otherwise to 0
             numbers_with_noise.append(matrix_with_noise.flatten())
-            results.append(i)
+            result = [0] * 10
+            result[i] = 1
+            results.append(result)
     return [numbers_with_noise, results]
 
 
-def get_expected_output():
+def get_expected_digits():
     results = []
     for i in range(0, 10):
         out = [0] * 10
@@ -88,5 +90,27 @@ def transform_csv_to_list(csv_file):
     return groups
 
 
+#METRICAS!
 def test_network(network, data):
+    input_data = data[0]
+    expected_output = data[1]
+    for i in range(len(input_data)):
+        forward = network.forward_propagation(input_data[i])
+        max_value = 0
+        idx = -1
+        for j in range(len(forward)):
+            if forward[j] > max_value:
+                max_value = forward[j]
+                idx = j
+        if expected_output[i][idx] == 1:
+            print("adivinastesssss, era el ", idx)
+        else:
+            print("fallo! no era el ", idx)
 
+def shuffle_arrays(x, y):
+    x = np.array(x)
+    y = np.array(y)
+    perm = np.random.permutation(len(x))
+    x_shuffled = x[perm]
+    y_shuffled = y[perm]
+    return x_shuffled.tolist(), y_shuffled.tolist()

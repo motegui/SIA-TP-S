@@ -12,6 +12,9 @@ class Neuron:
         self.prime_theta = prime_theta
         self.weights = weights
         self.inputs = []
+        #adam parameters
+        self.m = None
+        self.v = None
 
     def compute_output(self):
         t = np.multiply(self.inputs, self.weights)
@@ -35,11 +38,18 @@ class Neuron:
 
     def compute_delta(self, prev_deltas, connected_weights):
         self.delta = sum(np.multiply(prev_deltas, connected_weights)) * self.prime_theta(self.compute_excitement())
-        self.delta_w += optimizers.get(config.get("optimizer"))(config.get("step"), self)
+        self.delta_w += gradient_descend(config.get("step"), self)
         return self.delta
 
     def update_weights(self):
         self.weights = np.array(self.weights) + np.array(self.delta_w)
+
+    def adam(self, epoch):
+        self.m = (config.get("b1") * self.m + (1 - config.get("b1")) * (self.delta_w))
+        self.v = (config.get("b2") * self.v + (1 - config.get("b2")) * (self.delta_w) ** 2)
+        m_hat = self.m / (1 - config.get("b1") ** (epoch + 1))
+        v_hat = self.v / (1 - config.get("b2") ** (epoch + 1))
+        self.delta_w = config.get("step") * m_hat / (np.sqrt(v_hat) + config.get("e"))
 
     def __str__(self):
         # return str(str(self.weights), str(self.inputs), str(self.delta))

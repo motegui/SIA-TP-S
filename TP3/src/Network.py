@@ -17,8 +17,12 @@ class Network:
 
     def forward_propagation(self, input_data):
         inputs = input_data
+        i = 0
         for layer in self.layers:
+            i += 1
+            print(inputs, i)
             inputs = layer.forward(inputs)
+
         return inputs
 
     def updated_forward_propagation(self, input_data):
@@ -27,7 +31,7 @@ class Network:
             inputs = layer.updated_forward(inputs)
         return inputs
 
-    def back_propagation(self, forward_output, expected_output):
+    def back_propagation(self, forward_output, expected_output, epoch):
         prev_deltas = []
         for i in range(len(self.layers) - 1, -1, -1):
             layer = self.layers[i]
@@ -38,13 +42,16 @@ class Network:
                     op = expected_output[j] - forward_output[j]
                     layer.neurons[j].delta = np.multiply(op, layer.neurons[j].prime_theta(t))
 
-                    layer.neurons[j].delta_w += optimizers.get(config.get("optimizer"))(config.get("step"),
-                                                                                        layer.neurons[j])
+                    layer.neurons[j].delta_w += gradient_descend(config.get("step"), layer.neurons[j])
+
+                    if config.get("optimizer") == "adam":
+                        layer.neurons[j].adam(epoch)
+
                     prev_deltas.append(layer.neurons[j].delta)
             else:
                 # calcular delta -> funcion norma
                 connected_weights = self.layers[i + 1].get_weights()
-                prev_deltas = layer.compute_deltas(prev_deltas, connected_weights)
+                prev_deltas = layer.compute_deltas(prev_deltas, connected_weights, epoch)
 
     def get_weights(self):
         weights = []
