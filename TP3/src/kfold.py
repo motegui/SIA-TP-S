@@ -77,7 +77,6 @@ def kfold_cross_validation_multilayer(data, network, input_count, k, metrics_tes
 
         x_train = np.concatenate(splitted_x[:fold] + splitted_x[fold + 1:]).tolist()
         y_train = np.concatenate(splitted_y[:fold] + splitted_y[fold + 1:]).tolist()
-        # print(len(x_train))
         err_train = multilayer_perceptron(x_train, y_train, compute_error_multilayer,
                                              config.get("limit"), config.get("epsilon"), network_k)
         x_test = splitted_x[fold]

@@ -82,11 +82,9 @@ def multilayer_perceptron(input_data, expected_output, compute_error_function, l
             print_to_CSV('multilayer_perceptron_errors.csv', error, i)
 
         if error < min_error:
-            print(error)
             min_error = error
             network.update_layer_weights()
         i += 1
-    print(i)
     return min_error
 
 

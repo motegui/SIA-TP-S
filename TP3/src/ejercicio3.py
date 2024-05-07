@@ -19,9 +19,8 @@ def main():
     output_data = [[-1], [1], [1], [-1]]
     error = multilayer_perceptron(input_data, output_data, compute_error_multilayer, 100000, 0.1, network)
 
-    print('error is ', error)
+    print('Error is ', error)
 
-    print('weights are',network.get_weights())
     print("/////////////////////////////////////")
     print(network.forward_propagation([1, -1]))
     print("/////////////////////////////////////")
@@ -29,7 +28,6 @@ def main():
     print(network.forward_propagation([-1, 1]))
     print(network.forward_propagation([1, 1]))
 
-    print(network)
     print('----------------------------------------------------')
     # excercise 3.b
     #without extra data
