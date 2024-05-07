@@ -20,7 +20,7 @@ class Network:
         i = 0
         for layer in self.layers:
             i += 1
-            print(inputs, i)
+            # print(inputs, i)
             inputs = layer.forward(inputs)
 
         return inputs

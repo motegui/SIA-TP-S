@@ -84,8 +84,8 @@ def kfold_cross_validation_multilayer(data, network, input_count, k):
         x_test = splitted_x[fold]
         y_test = splitted_y[fold]
 
+        test_network(network_k, [x_train, y_train])
         test_network(network_k, [x_test, y_test])
-        # error_testing_set.append(err_test)
-        # error_training_set.append(err_train)
+
     return [error_training_set, error_testing_set]
 

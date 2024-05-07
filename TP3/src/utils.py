@@ -44,6 +44,7 @@ def real_output(input_data, w, theta):
 def create_numbers_with_noise(clean_numbers, qty_by_number):
     numbers_with_noise = []
     results = []
+    actual_numbers = []
     for i, number in enumerate(clean_numbers):
         for _ in range(qty_by_number):
             clean_matrix = np.array(number.split(), dtype=int).reshape(5, 7)
@@ -54,7 +55,8 @@ def create_numbers_with_noise(clean_numbers, qty_by_number):
             result = [0] * 10
             result[i] = 1
             results.append(result)
-    return [numbers_with_noise, results]
+            actual_numbers.append(i)
+    return [[t.tolist() for t in numbers_with_noise], results, actual_numbers]
 
 
 def get_expected_digits():
@@ -89,23 +91,6 @@ def transform_csv_to_list(csv_file):
 
     return groups
 
-
-#METRICAS!
-def test_network(network, data):
-    input_data = data[0]
-    expected_output = data[1]
-    for i in range(len(input_data)):
-        forward = network.forward_propagation(input_data[i])
-        max_value = 0
-        idx = -1
-        for j in range(len(forward)):
-            if forward[j] > max_value:
-                max_value = forward[j]
-                idx = j
-        if expected_output[i][idx] == 1:
-            print("adivinastesssss, era el ", idx)
-        else:
-            print("fallo! no era el ", idx)
 
 def shuffle_arrays(x, y):
     x = np.array(x)

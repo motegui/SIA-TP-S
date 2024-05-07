@@ -1,12 +1,12 @@
 {
-  "beta": 3,
+  "beta": 0.15,
   "epsilon": 0.2,
   "theta": {
     "name": "lineal",
     "miny": 0,
     "maxy": 1
   },
-  "step": 0.0001,
+  "step": 0.001,
   "limit": 100000,
   "K": 5,
   "optimizer": "adam",
