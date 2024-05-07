@@ -68,6 +68,36 @@ def get_expected_digits():
     return results
 
 
+#returns 0 if its an odd(impar) number, 1 if its even(par)
+def get_expected_even():
+    results = []
+    for i in range(0, 10):
+        if i % 2 == 0:
+            results.append([1])
+        else: results.append([-1])
+    return results
+
+
+
+def create_numbers_with_noise_even(clean_numbers, qty_by_number):
+    numbers_with_noise = []
+    results = []
+    for i, number in enumerate(clean_numbers):
+        for _ in range(qty_by_number):
+            clean_matrix = np.array(number.split(), dtype=int).reshape(5, 7)
+            noise = np.random.normal(0, 0.3, (5, 7))  # Gaussian noise with mean 0 and standard deviation 0.1
+            matrix_with_noise = clean_matrix + noise
+            matrix_with_noise = (matrix_with_noise >= 0.5).astype(int)  # Convert values >= 0.5 to 1, otherwise to 0
+            numbers_with_noise.append(matrix_with_noise.flatten())
+        if i % 2 == 0:
+            for _ in range(qty_by_number):
+                results.append([1])
+        else:
+            for _ in range(qty_by_number):
+                results.append([-1])
+
+    return [numbers_with_noise, results]
+
 def get_clean_matrix(clean_numbers):
     result = []
     for number in clean_numbers:

@@ -35,6 +35,10 @@ def lineal_nonlineal_perceptron(input_data, expected_output, initialize_weight, 
     w = initialize_weight(len(input_data[0]))
     min_error = math.inf
     w_min = None
+    csv_path = 'lineal_nonlineal_perceptron_errors.csv'
+    # Eliminar el archivo si existe antes de comenzar las iteraciones
+    if os.path.exists(csv_path):
+        os.remove(csv_path)
     while min_error > epsilon and i < limit:
         u = random.randint(0, len(input_data) - 1)  # u es mu
         x = [1] + input_data[u]
@@ -43,7 +47,7 @@ def lineal_nonlineal_perceptron(input_data, expected_output, initialize_weight, 
         delta_w = np.multiply(step * (expected_output[u] - o) * theta_prime(h), x)
         w += delta_w
         error = compute_error_function([input_data, expected_output], w, theta)
-        print_to_CSV('lineal_nonlineal_perceptron_errors.csv', error)
+        print_to_CSV('lineal_nonlineal_perceptron_errors.csv', error, i)
 
         if error < min_error:
             min_error = error
@@ -58,7 +62,7 @@ def multilayer_perceptron(input_data, expected_output, compute_error_function, l
     i = 0
     min_error = math.inf
     batch_size = config.get('batch_size')
-    csv_path = 'staggered_perceptron_errors.csv'
+    csv_path = 'multilayer_perceptron_errors.csv'
     # Eliminar el archivo si existe antes de comenzar las iteraciones
     if os.path.exists(csv_path):
         os.remove(csv_path)
@@ -74,11 +78,11 @@ def multilayer_perceptron(input_data, expected_output, compute_error_function, l
             input_copy.remove(x)
             expected_copy.remove(exp)
         error = compute_error_function([input_data, expected_output], network)
-
-        print_to_CSV('multilayer_perceptron_errors.csv', error, i)
+        if i % 250 == 0:
+            print_to_CSV('multilayer_perceptron_errors.csv', error, i)
 
         if error < min_error:
-            print(error)
+            # print(error)
             min_error = error
             network.update_layer_weights()
         i += 1

@@ -36,6 +36,23 @@ def numbers_test(network, data):
     return confusion_matrix
 
 
+def even_test(network, data): # [0] recibe los input data, y en el valor [1] un array de [1 y -1]
+    input_data = data[0]
+    output_even_odd = data[1]
+    confusion_matrix = np.zeros((2, 2))
+
+    for input, expected_number in zip(input_data, output_even_odd):
+        prediction = network.forward_propagation(input)
+        # mayor a 0 par
+        # 0 clase par
+        # 1 clase impar
+        predicted_number = 0 if prediction[0] > 0 else 1
+        expected_number = 0 if expected_number[0] > 0 else 1
+        confusion_matrix[expected_number][predicted_number] += 1
+
+    return confusion_matrix
+
+
 def test_network(network, data, eval):
     confusion_matrix = eval(network, data)
     class_metrics = []
