@@ -7,7 +7,7 @@ from TP3.config import config
 
 class Network:
     def __init__(self, layers: list[Layer]):  # Recibe las layers en orden
-        self.layers = layers
+        self.matrix =
 
     def initialize(self, input_count):
         self.layers[0].populate_weights(input_count)
