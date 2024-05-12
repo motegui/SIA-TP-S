@@ -36,7 +36,6 @@ class Network:
             matrix[idx[0], idx[1]] += 1
             matrix_country[idx[0]][idx[1]] += ' ' + input[0] + ' '
 
-
         return matrix, matrix_country
 
 
@@ -50,5 +49,5 @@ def initialize_matrix(input_data, k, initialize_weight_type):
     input_data_copy = input_data.copy()
     for i in range(k):
         for j in range(k):
-            matrix[i][j] = Neuron(weight_function(input_data_copy))
+            matrix[i][j] = Neuron(weight_function(input_data_copy), i, j)
     return matrix

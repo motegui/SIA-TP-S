@@ -1,6 +1,7 @@
 import random
 from typing import *
 from Network import *
+from TP4.src.distance import euclidean
 
 
 def kohonen(
@@ -28,3 +29,29 @@ def kohonen(
 
         i += 1
     return network
+
+
+def calculate_u_matrix(network: Network) -> np.ndarray:
+    u_matrix = np.zeros_like(network.matrix, dtype=float)
+    for i in range(len(network.matrix)):
+        for j in range(len(network.matrix[0])):
+            neighbors = get_neighbors(network, i, j)
+            distances = []
+            for neighbor in neighbors:
+                #cannot use the network's distance bc for u matrix we must use the euclidean
+                distances.append(euclidean(network.matrix[i][j].weights, neighbor.weights))
+            u_matrix[i][j] = np.mean(distances)
+    return u_matrix
+
+
+def get_neighbors(network: Network, i: int, j: int) -> list:
+    neighbors = []
+    #itero por los vecinos
+    for dx in [-1, 0, 1]:
+        for dy in [-1, 0, 1]:
+            new_i = i + dx
+            new_j = j + dy
+            #controlo q no se vacha del limite
+            if 0 <= new_i < len(network.matrix) and 0 <= new_j < len(network.matrix[0]):
+                neighbors.append(network.matrix[new_i][new_j])
+    return neighbors
