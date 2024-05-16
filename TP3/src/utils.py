@@ -1,6 +1,6 @@
 import random
 import numpy as np
-from normalization import *
+from TP3.src.normalization import *
 
 
 def random_initialize_weight(dim):
