@@ -8,6 +8,7 @@ def standardize(data):
         mean = np.mean(data[:,i])
         std = np.std(data[:,i])
         w2 = ((data[:, i] - mean) / std).tolist()
+        data_standard.append(w2)
 
     return data_standard
 

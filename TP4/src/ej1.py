@@ -11,11 +11,18 @@ from TP4.src.standarize import standardize
 
 
 def main():
-    input_data = pd.read_csv('/Users/nicolastordomar/Desktop/SIA-TP-S/TP4/data/europe.csv')
-    input_data = input_data[
-        ['Country', 'Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']].values
+    csv_data = pd.read_csv('/Users/lucho/Desktop/Repos/SIA-TP-S/TP4/data/europe.csv')
+    input_data = csv_data[
+        ['Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']].values
+
+    countries = np.array(csv_data['Country'].values)
 
     input_data = standardize(input_data)
+    input_data = np.transpose(input_data)
+    input_data = [list(np.concatenate([np.array([countries[i]]), input_data[i].astype(float)])) for i in
+                  range(len(input_data))]
+    print(input_data)
+
     network = kohonen(input_data, 3, 2, euclidean, constant, 'input data', 0.1, 1)
 
     t = network.test(input_data)
