@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.stats import zscore
 
 
 def standardize(data):

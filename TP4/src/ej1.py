@@ -11,7 +11,7 @@ from TP4.src.standarize import standardize
 
 
 def main():
-    input_data = pd.read_csv('/Users/pazaramburu/Desktop/SIA-TP-S/TP4/data/europe.csv')
+    input_data = pd.read_csv('/Users/nicolastordomar/Desktop/SIA-TP-S/TP4/data/europe.csv')
     input_data = input_data[
         ['Country', 'Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']].values
 
