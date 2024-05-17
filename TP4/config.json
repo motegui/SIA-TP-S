@@ -7,7 +7,7 @@
     "maxy": 1
   },
   "step": 0.001,
-  "limit": 50000,
+  "limit": 60000,
   "K": 5,
   "optimizer": "adam",
   "b1": 0.9,

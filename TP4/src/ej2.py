@@ -13,14 +13,18 @@ def main():
     input_data = input_data[
         ['Country', 'Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']].values
 
-    input_data = standardize(input_data)
-    input_data_no_country = np.array(input_data)[:, 1:].astype(float)
+    input_data = standardize(np.array(input_data)[:, 1:].astype(float))
 
-    error_train, error_test = oja(input_data_no_country.tolist(), random_initialize_weight, config.get("limit"), config.get("step"),
-                                  config.get("epsilon"), lineal_theta)
+    w = oja(
+        np.array(input_data).transpose(),
+        random_initialize_weight,
+        config.get("limit"),
+        config.get("step"),
+        config.get("epsilon"),
+        lineal_theta
+    )
 
-    print(error_train, "\n", error_test)
-
+    print(w)
 
 
 if __name__ == '__main__':
