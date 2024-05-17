@@ -6,13 +6,17 @@ from sklearn.decomposition import PCA
 import seaborn as sns
 
 from matplotlib import pyplot as plt
+from adjustText import adjust_text
+
+from sklearn.preprocessing import StandardScaler
+
 from TP4.src.radius import constant
 from TP4.src.distance import euclidean
 from TP4.src.kohonen import kohonen
 from TP4.src.standarize import standardize
 
 
-def plot(means, std):
+def boxplot(data, title):
     name = ['Area', 'GDP', 'Inflation', 'Life Expect', 'Military', 'Pop Growth', 'Unemployment']
     color = [(1, 0.7, 0.7, 0.5),  # Rosa pastel transparente
              (0.7, 1, 0.7, 0.5),  # Verde claro pastel transparente
@@ -23,62 +27,69 @@ def plot(means, std):
              (1, 0.9, 0.7, 0.5)]  # Melocotón pastel transparente
 
     # Crear un gráfico de barras con las medias
-    plt.bar(name, means, yerr=std, capsize=5, color=color)
+    plt.figure(figsize=(12, 8))
+    box = plt.boxplot(data, patch_artist=True, labels=name)
+
+    for patch, color in zip(box['boxes'], color):
+        patch.set_facecolor(color)
+    plt.title('Boxplot')
+    plt.grid(True, axis='y')
 
     # Etiquetas y título
-    plt.xlabel('Input data')
-    plt.ylabel('Data mean')
-    plt.title('Mean and std with no standarize')
+    plt.title(title)
+    plt.xticks(rotation=30)
 
     # Mostrar el gráfico
     plt.show()
 
 
 def main():
+    csv_data = pd.read_csv('/Users/pazaramburu/Desktop/SIA-TP-S/TP4/data/europe.csv')
+    input_data = csv_data[
+        ['Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']].values
+    countries = csv_data['Country'].values
 
-    input_data = pd.read_csv('/Users/nicolastordomar/Desktop/SIA-TP-S/TP4/data/europe.csv')
-    input_data = input_data[
-        ['Country', 'Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']].values
+    boxplot(input_data, 'Boxplot of variables not standardized')
 
+    standarized_data = standardize(input_data)
 
+    boxplot(standarized_data,  'Boxplot of variables standardized')
+    pca = PCA(n_components=2)
+    # print(standarized_data)
+    pca_fitted = pca.fit_transform(np.transpose(standarized_data))
+    print(pca_fitted)
 
-    means = [np.mean(input_data[:,i]) for i in range(1,len(input_data[0]))]
-    std = [np.std(input_data[:,i]) for i in range(1,len(input_data[0]))]
-
-    plot(means,std)
-
-    #stadarized!
-    input_data = np.array(standardize(input_data))
-    means = [np.mean(input_data[:,i].astype(float)) for i in range(1,len(input_data[0]))]
-    std = [np.std(input_data[:,i].astype(float)) for i in range(1,len(input_data[0]))]
-
-    plot(means, std)
-
-
-    print(input_data)
-    print(input_data[:,1:])
-    pca = PCA(n_components=1)
-    componentes_principales = pca.fit_transform(np.transpose(input_data[:, 1:].astype(float)))
-    print(componentes_principales)
+    pc1 = pca_fitted[:,0]
+    pc2 = pca_fitted[:,1]
 
 
-#
-#
-# input_data = standardize(input_data)
-# network = kohonen(input_data, 2, 10000, euclidean, constant, 'input data', 0.1, 1)
-#
-# t = network.test(input_data)
-# colors = [(256, 256, 256), (1, 0, 0)]  # Negro al rojo
-#
-# # Crear el mapa de colores personalizado
-# cmap = LinearSegmentedColormap.from_list('custom', colors)
-# ax = sns.heatmap(t[0].astype(float), cmap=cmap, vmin=np.min(t[0].astype(float)), vmax=np.max(t[0].astype(float)))
-# plt.colorbar()
-# plt.show()
-#
-# print(t[0])
-# print(t[1])
-#
+    plt.figure(figsize=(200, 15))
+    plt.bar(countries, pc1, color=(0.7, 0.7, 1, 0.5))
+    plt.xticks(rotation=90, fontsize=14)
+    plt.title('PC1 Index', fontsize=20)
+    plt.ylabel('PC1', fontsize=14)
+    plt.grid(axis='y')
+    plt.show()
+
+    df = {"pc1": pc1, "pc2": pc2, "country": countries}
+    plt.figure(figsize=(15, 15))
+    sns.scatterplot(x="pc1",y="pc2", data=df, s=100)
+    for i, name in enumerate(['Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']):
+        plt.arrow(0, 0, pca.components_[0][i], pca.components_[1][i], alpha=0.5)
+        plt.text(pca.components_[0][i], pca.components_[1][i], name, ha='center', va='center', fontweight='bold')
+
+    plt.title('PCA Scatter Plot', fontsize=25)
+    plt.xlabel('PC1', fontsize=20)
+    plt.ylabel('PC2', fontsize=20)
+    plt.legend(title='Countries', fontsize=14)
+    plt.grid(True)
+    texts = []
+    for i in range(len(df['country'])):
+        texts.append(plt.text(df['pc1'][i], df['pc2'][i], df['country'][i], fontsize=10, color='#336699'))
+
+    adjust_text(texts, arrowprops=dict(arrowstyle='->', color='gray', lw=0.5))
+    plt.show()
+
 
 if __name__ == '__main__':
     main()
