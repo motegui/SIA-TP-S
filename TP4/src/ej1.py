@@ -32,15 +32,24 @@ def main():
     plt.colorbar()
     colors = [(0, 0, 0), (1, 0.2, 0), (1, 0, 0)]  # Negro al rojo
 
-    #Crear el mapa de colores personalizado (mapa interactivo)
-    cmap = LinearSegmentedColormap.from_list('custom', colors)
-    colorscale = [[0, 'red'], [1, 'black']]
-    country_matrix = [[f"{country}<br>{int(value)}" for country, value in zip(countries, row_values)] for
-                      countries, row_values in zip(t[1], m)]
-    heatmap = go.Heatmap(z=m, colorscale=colorscale, text=country_matrix, hoverinfo='text')
-    layout = go.Layout(title="Heatmap with Country Names and Total Quantity")
-    fig = go.Figure(data=[heatmap], layout=layout)
-    fig.show()
+    #heatmap(mapa interactivo)
+    # cmap = LinearSegmentedColormap.from_list('custom', colors)
+    # colorscale = [[0, 'red'], [1, 'black']]
+    # country_matrix = [[f"{country}<br>{int(value)}" for country, value in zip(countries, row_values)] for
+    #                   countries, row_values in zip(t[1], m)]
+    # heatmap = go.Heatmap(z=m, colorscale=colorscale, text=country_matrix, hoverinfo='text')
+    # layout = go.Layout(title="Heatmap with Country Names and Total Quantity")
+    # fig = go.Figure(data=[heatmap], layout=layout)
+    # fig.show()
+
+    #heatmap no interactivo ( funciona, no puedo hacer que los nombres de los paises se vean clean)
+    # cmap = LinearSegmentedColormap.from_list('custom', colors)
+    # annotations = [[f"{country} ({value:.0f})\n" for country, value in zip(countries, row_values)] for
+    #                countries, row_values in zip(t[1], m)]
+    # plt.figure(figsize=(12, 10))  # Ajusta el tamaño de la figura
+    # sns.heatmap(m, annot=annotations, fmt='', cmap=cmap, cbar_kws={'label': 'Values'})
+    # plt.title("Heatmap with Country Names and Quantities")
+    # plt.show()
 
     #matriz u
     u_matrix = calculate_u_matrix(network)
@@ -48,11 +57,11 @@ def main():
     sns.heatmap(u_matrix, annot=True, cmap=u_cmap, vmin=np.max(u_matrix),
                 vmax=np.min(u_matrix))
     plt.title("Matriz U")
-    plt.show()
+    #plt.show()
 
     #print(t[1])
     #-------
-   #diccionario para hacer matriz de coincidencias 
+   #diccionario para hacer matriz de coincidencias
     # coincidence_matrix = {}
     #
     # # Ejecutar el algoritmo de Kohonen 100 veces
