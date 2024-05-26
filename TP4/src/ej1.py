@@ -3,7 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from utils import *
-from TP4.src.kohonen import kohonen, calculate_u_matrix
+from TP4.src.kohonen import kohonen, calculate_u_matrix, calculate_u_matrix_by_variable
 from TP4.src.distance import euclidean
 from TP4.src.radius import constant
 import seaborn as sns
@@ -12,7 +12,7 @@ import plotly.graph_objects as go
 
 
 def main():
-    csv_data = pd.read_csv('/Users/motegui/Documents/GitHub/SIA-TP-S/TP4/data/europe.csv')
+    csv_data = pd.read_csv('/Users/pazaramburu/Desktop/SIA-TP-S/TP4/data/europe.csv')
     input_data = csv_data[
         ['Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']].values
 
@@ -24,7 +24,7 @@ def main():
                   range(len(input_data))]
     #print(input_data)
 
-    network = kohonen(input_data, 3, 2, euclidean, constant, 'input data', 0.1, 1)
+    network = kohonen(input_data, 5, 2, euclidean, constant, 'input data', 0.1, 1)
 
     t = network.test(input_data)
     m = t[0].astype(float)
@@ -43,13 +43,13 @@ def main():
     # fig.show()
 
     #heatmap no interactivo ( funciona, no puedo hacer que los nombres de los paises se vean clean)
-    # cmap = LinearSegmentedColormap.from_list('custom', colors)
-    # annotations = [[f"{country} ({value:.0f})\n" for country, value in zip(countries, row_values)] for
-    #                countries, row_values in zip(t[1], m)]
-    # plt.figure(figsize=(12, 10))  # Ajusta el tamaño de la figura
-    # sns.heatmap(m, annot=annotations, fmt='', cmap=cmap, cbar_kws={'label': 'Values'})
-    # plt.title("Heatmap with Country Names and Quantities")
-    # plt.show()
+    cmap = LinearSegmentedColormap.from_list('custom', colors)
+    annotations = [[f"{country} ({value:.0f})\n" for country, value in zip(countries, row_values)] for
+                   countries, row_values in zip(t[1], m)]
+    plt.figure(figsize=(12, 10))  # Ajusta el tamaño de la figura
+    sns.heatmap(m, annot=annotations, fmt='', cmap=cmap, cbar_kws={'label': 'Values'})
+    plt.title("Heatmap with Country Names and Quantities")
+    plt.show()
 
     #matriz u
     u_matrix = calculate_u_matrix(network)
@@ -57,7 +57,7 @@ def main():
     sns.heatmap(u_matrix, annot=True, cmap=u_cmap, vmin=np.max(u_matrix),
                 vmax=np.min(u_matrix))
     plt.title("Matriz U")
-    #plt.show()
+    plt.show()
 
     #print(t[1])
     #-------
@@ -109,6 +109,16 @@ def main():
     #         coincidence_matrix[country1].setdefault(country2, 0)
     # print_sorted_table(coincidence_matrix)
     # pass
+
+    #u matrix by variable
+    for index, name in enumerate(['Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']):
+        u_matrix = calculate_u_matrix_by_variable(network, index)
+        u_cmap = LinearSegmentedColormap.from_list('custom', [(0.15, 0.15, 0.15), (1, 1, 1)])
+        sns.heatmap(u_matrix, annot=True, cmap=u_cmap, vmin=np.max(u_matrix),
+                    vmax=np.min(u_matrix))
+        plt.title("Matriz U para "+ name)
+        plt.show()
+
 
 if __name__ == '__main__':
     main()
