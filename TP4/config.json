@@ -15,7 +15,10 @@
   "e": 10e-8,
   "batch_size": 5,
   "kohonen": {
-    "radius": 8,
-    "k": 4
+    "radius": 4,
+    "k": 4,
+    "max_radius": 10,
+    "min_radius": 1,
+    "limit": 100
   }
 }

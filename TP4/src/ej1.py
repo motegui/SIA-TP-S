@@ -7,7 +7,7 @@ from TP4.config import config
 from utils import *
 from TP4.src.kohonen import kohonen, calculate_u_matrix, calculate_u_matrix_by_variable
 from TP4.src.distance import euclidean
-from TP4.src.radius import constant
+from TP4.src.radius import constant, decreasing
 import seaborn as sns
 from TP4.src.standarize import standardize
 import plotly.graph_objects as go
@@ -26,7 +26,7 @@ def main():
                   range(len(input_data))]
     #print(input_data)
     k = config.get("kohonen").get("k")
-    network = kohonen(input_data, k, 2, euclidean, constant, 'RANDOM', 0.1, 2)
+    network = kohonen(input_data, k, config.get("kohonen").get("limit"), euclidean, constant, 'input data', 0.1, 2)
 
     t = network.test(input_data)
     m = t[0].astype(float)
