@@ -1,7 +1,9 @@
+from TP4.config import config
 
 
 def constant(i):
-    return 1.5
+    return config.get("kohonen").get("radius")
+
 
 
 

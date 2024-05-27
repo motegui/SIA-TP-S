@@ -2,7 +2,7 @@ import random
 
 
 def random_initializer(input_data) -> list:
-    return [random.uniform(0, 1) for _ in input_data[0] - 1]
+    return [random.uniform(0, 1) for _ in range(len(input_data[0]) - 1)]
 
 
 def input_initializer(input_data) -> list:

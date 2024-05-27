@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
+
+from TP4.config import config
 from utils import *
 from TP4.src.kohonen import kohonen, calculate_u_matrix, calculate_u_matrix_by_variable
 from TP4.src.distance import euclidean
@@ -23,8 +25,8 @@ def main():
     input_data = [list(np.concatenate([np.array([countries[i]]), input_data[i].astype(float)])) for i in
                   range(len(input_data))]
     #print(input_data)
-
-    network = kohonen(input_data, 5, 2, euclidean, constant, 'input data', 0.1, 1)
+    k = config.get("kohonen").get("k")
+    network = kohonen(input_data, k, 2, euclidean, constant, 'RANDOM', 0.1, 2)
 
     t = network.test(input_data)
     m = t[0].astype(float)
@@ -44,8 +46,22 @@ def main():
 
     #heatmap no interactivo ( funciona, no puedo hacer que los nombres de los paises se vean clean)
     cmap = LinearSegmentedColormap.from_list('custom', colors)
-    annotations = [[f"{country} ({value:.0f})\n" for country, value in zip(countries, row_values)] for
-                   countries, row_values in zip(t[1], m)]
+    annotations = []
+    for countries, row_values in zip(t[1], m):
+        row_annotations = []
+        for country_list, value in zip(countries, row_values):
+            if country_list:
+                country_str = country_list.replace('  ', '\n')
+                annotation = f"{country_str}\n({int(value)})"
+            else:
+                annotation = f"({int(value)})"
+            row_annotations.append(annotation)
+        annotations.append(row_annotations)
+
+    annotations = np.array(annotations)
+
+    print(annotations)
+    # print(annotations)
     plt.figure(figsize=(12, 10))  # Ajusta el tamaño de la figura
     sns.heatmap(m, annot=annotations, fmt='', cmap=cmap, cbar_kws={'label': 'Values'})
     plt.title("Heatmap with Country Names and Quantities")
@@ -61,7 +77,7 @@ def main():
 
     #print(t[1])
     #-------
-   #diccionario para hacer matriz de coincidencias
+    #diccionario para hacer matriz de coincidencias
     # coincidence_matrix = {}
     #
     # # Ejecutar el algoritmo de Kohonen 100 veces
@@ -116,7 +132,7 @@ def main():
         u_cmap = LinearSegmentedColormap.from_list('custom', [(0.15, 0.15, 0.15), (1, 1, 1)])
         sns.heatmap(u_matrix, annot=True, cmap=u_cmap, vmin=np.max(u_matrix),
                     vmax=np.min(u_matrix))
-        plt.title("Matriz U para "+ name)
+        plt.title("Matriz U para " + name)
         plt.show()
 
 

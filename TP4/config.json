@@ -13,5 +13,9 @@
   "b1": 0.9,
   "b2": 0.999,
   "e": 10e-8,
-  "batch_size": 5
+  "batch_size": 5,
+  "kohonen": {
+    "radius": 8,
+    "k": 4
+  }
 }

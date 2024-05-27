@@ -24,7 +24,9 @@ def kohonen(
             u = random.randint(0, len(input_copy) - 1)
             x = input_copy[u]
             winner_index = network.get_winner_neuron_index(x[1:])
-            network.update_weights(winner_index, radius(i), learning_rate, x)
+            r = radius(i)
+
+            network.update_weights(winner_index, x[1:], r, learning_rate)
             batch_idx += 1
 
         i += 1
