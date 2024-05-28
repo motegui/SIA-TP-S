@@ -26,7 +26,7 @@ def main():
                   range(len(input_data))]
     #print(input_data)
     k = config.get("kohonen").get("k")
-    network = kohonen(input_data, k, config.get("kohonen").get("limit"), euclidean, constant, 'input data', 0.1, 2)
+    network = kohonen(input_data, k, config.get("kohonen").get("limit"), euclidean, decreasing, 'input data', 0.1, 2)
 
     t = network.test(input_data)
     m = t[0].astype(float)
