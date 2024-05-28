@@ -73,7 +73,7 @@ def biplot(data, countries):
 
 
 def main():
-    csv_data = pd.read_csv('/Users/pazaramburu/Desktop/SIA-TP-S/TP4/data/europe.csv')
+    csv_data = pd.read_csv('/Users/nicolastordomar/Desktop/SIA-TP-S/TP4/data/europe.csv')
     input_data = csv_data[
         ['Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']].values
     countries = csv_data['Country'].values

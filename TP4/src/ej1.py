@@ -14,7 +14,7 @@ import plotly.graph_objects as go
 
 
 def main():
-    csv_data = pd.read_csv('/Users/pazaramburu/Desktop/SIA-TP-S/TP4/data/europe.csv')
+    csv_data = pd.read_csv('/Users/lucho/Desktop/Repos/SIA-TP-S/TP4/data/europe.csv')
     input_data = csv_data[
         ['Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']].values
 
@@ -24,18 +24,17 @@ def main():
     input_data = np.transpose(input_data)
     input_data = [list(np.concatenate([np.array([countries[i]]), input_data[i].astype(float)])) for i in
                   range(len(input_data))]
-    # print(input_data)
+    #print(input_data)
     k = config.get("kohonen").get("k")
-    network = kohonen(input_data, k, config.get("kohonen").get("limit"), euclidean, decreasing, 'input data', 0.1,
-                      config.get("batch_size"))
+    network = kohonen(input_data, k, config.get("kohonen").get("limit"), euclidean, decreasing, 'input data', 0.1, 2)
 
     t = network.test(input_data)
     m = t[0].astype(float)
-    # plt.imshow(m, cmap='hot', interpolation='nearest')
-    # plt.colorbar()
+    plt.imshow(m, cmap='hot', interpolation='nearest')
+    plt.colorbar()
     colors = [(0, 0, 0), (1, 0.2, 0), (1, 0, 0)]  # Negro al rojo
 
-    # heatmap(mapa interactivo)
+    #heatmap(mapa interactivo)
     # cmap = LinearSegmentedColormap.from_list('custom', colors)
     # colorscale = [[0, 'red'], [1, 'black']]
     # country_matrix = [[f"{country}<br>{int(value)}" for country, value in zip(countries, row_values)] for
@@ -45,7 +44,7 @@ def main():
     # fig = go.Figure(data=[heatmap], layout=layout)
     # fig.show()
 
-    # heatmap no interactivo ( funciona, no puedo hacer que los nombres de los paises se vean clean)
+    #heatmap no interactivo ( funciona, no puedo hacer que los nombres de los paises se vean clean)
     cmap = LinearSegmentedColormap.from_list('custom', colors)
     annotations = []
     for countries, row_values in zip(t[1], m):
@@ -68,7 +67,7 @@ def main():
     plt.title("Heatmap with Country Names and Quantities")
     plt.show()
 
-    # matriz u
+    #matriz u
     u_matrix = calculate_u_matrix(network)
     u_cmap = LinearSegmentedColormap.from_list('custom', [(0.15, 0.15, 0.15), (1, 1, 1)])
     sns.heatmap(u_matrix, annot=True, cmap=u_cmap, vmin=np.max(u_matrix),
@@ -76,9 +75,9 @@ def main():
     plt.title("Matriz U")
     plt.show()
 
-    # print(t[1])
-    # -------
-    # diccionario para hacer matriz de coincidencias
+    #print(t[1])
+    #-------
+    #diccionario para hacer matriz de coincidencias
     # coincidence_matrix = {}
     #
     # # Ejecutar el algoritmo de Kohonen 100 veces
@@ -127,7 +126,7 @@ def main():
     # print_sorted_table(coincidence_matrix)
     # pass
 
-    # u matrix by variable
+    #u matrix by variable
     for index, name in enumerate(['Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']):
         u_matrix = calculate_u_matrix_by_variable(network, index)
         u_cmap = LinearSegmentedColormap.from_list('custom', [(0.15, 0.15, 0.15), (1, 1, 1)])
