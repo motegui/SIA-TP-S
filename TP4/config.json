@@ -6,5 +6,12 @@
     "max_radius": 4,
     "min_radius": 1,
     "limit": 100
+  },
+  "oja": {
+    "limit": 3000,
+    "step": 0.001
+  },
+  "hopfield": {
+    "limit": 3000
   }
 }
