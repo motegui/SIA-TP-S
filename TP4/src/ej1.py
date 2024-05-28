@@ -14,7 +14,7 @@ import plotly.graph_objects as go
 
 
 def main():
-    csv_data = pd.read_csv('/Users/pazaramburu/Desktop/SIA-TP-S/TP4/data/europe.csv')
+    csv_data = pd.read_csv('/Users/lucho/Desktop/Repos/SIA-TP-S/TP4/data/europe.csv')
     input_data = csv_data[
         ['Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']].values
 
