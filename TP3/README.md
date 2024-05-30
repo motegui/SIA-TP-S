@@ -29,3 +29,8 @@ pipenv install
 Ejecución
 --
 Para poder probar el proyecto hay que ejecutar el cada ejercicio por separado.
+
+
+
+## Link a la presentación
+https://docs.google.com/presentation/d/11lgD_7xoJRlA6sUX3mHAMLDZ5BwYCaIlWDA6MQKO4to/edit?usp=sharing

@@ -111,3 +111,9 @@ Para poder probar el proyecto hay que ejecutar el main.py. En config.json se esp
         }
     }
 }
+
+```
+
+## Link a la presentación TP2
+
+https://docs.google.com/presentation/d/1fMst1zYPzgmAhkh2W6q2rzegr-6VeSozbGJouFpUN8c/edit?usp=sharing
