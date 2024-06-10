@@ -42,9 +42,7 @@ class Network:
                     t = layer.neurons[j].compute_excitement()
                     op = expected_output[j] - forward_output[j]
                     layer.neurons[j].delta = np.multiply(op, layer.neurons[j].prime_theta(t))
-
                     layer.neurons[j].delta_w += gradient_descend(config.get("step"), layer.neurons[j])
-
                     if config.get("optimizer") == "adam":
                         layer.neurons[j].adam(epoch)
 
