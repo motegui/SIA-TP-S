@@ -1,5 +1,7 @@
+import numpy as np
+
 from TP3.config import config
-from utils import *
+from TP3.src.utils import *
 
 
 class Layer:
@@ -46,6 +48,9 @@ class Layer:
     def update_neuron_weights(self):
         for neuron in self.neurons:
             neuron.update_weights()
+
+    def reset_deltas(self):
+        for neuron in self.neurons:
             neuron.delta_w = np.zeros(len(neuron.weights))
 
     def __str__(self):

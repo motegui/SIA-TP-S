@@ -1,5 +1,4 @@
 import numpy as np
-from optimization import *
 from TP3.config import *
 
 

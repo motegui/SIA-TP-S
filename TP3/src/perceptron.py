@@ -84,6 +84,8 @@ def multilayer_perceptron(input_data, expected_output, compute_error_function, l
         if error < min_error:
             min_error = error
             network.update_layer_weights()
+
+        network.reset_deltas()
         i += 1
     return min_error
 
@@ -93,3 +95,5 @@ def print_to_CSV(file_path, error, epoch):
     with open(file_path, mode='a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([epoch, error])
+
+

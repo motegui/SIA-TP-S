@@ -1,8 +1,9 @@
 import numpy as np
 
-from Neuron import *
-from Layer import *
+from TP3.src.Layer import *
 from TP3.config import config
+from TP3.src.Neuron import Neuron
+from TP3.src.optimization import gradient_descend
 
 
 class Network:
@@ -72,6 +73,10 @@ class Network:
     def update_layer_weights(self):
         for layer in self.layers:
             layer.update_neuron_weights()
+
+    def reset_deltas(self):
+        for layer in self.layers:
+            layer.reset_deltas()
 
 
 def layer_n_neurons(neuron_count, theta, prime_theta):
