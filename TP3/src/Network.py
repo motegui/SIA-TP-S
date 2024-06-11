@@ -76,23 +76,24 @@ class Network:
         for layer in self.layers:
             layer.reset_deltas()
 
+    def get_decoder_encoder(self):
+        for i in range(0, len(self.layers)):
+            if self.layers[i].is_latent:
+                return Network(self.layers[:i + 1]), Network(self.layers[i + 1:])
 
-def layer_n_neurons(neuron_count, theta, prime_theta):
+
+def layer_n_neurons(neuron_count, theta, prime_theta, is_latent=False):
     neurons = []
     for i in range(neuron_count):
         neuron = Neuron(theta, prime_theta)
         neurons.append(neuron)
-    return Layer(neurons)
+    return Layer(neurons, is_latent)
 
-
-# [
-#     [[], []]
-# ]
 def create_weighted_network(weights, theta, prime_theta):
     layers = []
     for layer in weights:
         neurons = []
         for neuron_weights in layer:
             neurons.append(Neuron(weights=neuron_weights, theta=theta, prime_theta=prime_theta))
-        layers.append(Layer(neurons))
+        layers.append(Layer(neurons, len(neurons) == 2))
     return Network(layers)

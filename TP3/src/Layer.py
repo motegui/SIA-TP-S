@@ -5,9 +5,10 @@ from TP3.src.utils import *
 
 
 class Layer:
-    def __init__(self, neurons=None):
+    def __init__(self, neurons=None, is_latent=False):
         self.neurons = neurons
         self.neuron_len = len(neurons)
+        self.is_latent = is_latent
 
     def forward(self, inputs):
         out = []
