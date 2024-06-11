@@ -9,8 +9,8 @@ def get_letters():
         let = []
         for line in letter:
             bin = format(line, '05b')
-
             bits = list(map(int, bin))
+            # bits = [-1 if x == 0 else x for x in bits]
             let.append(bits)
         matrix.append(np.array(let).flatten().tolist())
     return matrix
