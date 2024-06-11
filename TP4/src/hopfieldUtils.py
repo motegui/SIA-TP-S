@@ -216,6 +216,8 @@ def find_most_orthonormal_vectors(vectors, k):
             best_orthogonality = orthogonality
             best_subset.append(subset)
             best_subset_ortogonality.append(orthogonality)
+            if orthogonality <= best_subset_ortogonality[0]/2:
+                return best_subset, best_subset_ortogonality
     return best_subset, best_subset_ortogonality
 
 
