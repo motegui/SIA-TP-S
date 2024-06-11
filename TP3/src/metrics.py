@@ -76,3 +76,4 @@ def test_network(network, data, eval):
         })
         metrics_array.append([i, ac, pr, rec, f1])
     return class_metrics, metrics_array
+
