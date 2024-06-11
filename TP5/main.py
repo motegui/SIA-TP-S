@@ -9,7 +9,8 @@ from TP3.src.perceptron import multilayer_perceptron
 from TP3.src.theta_functions import hyp_tan_theta, hyp_tan_prime_theta, logistic_theta, logistic_prime_theta, \
     lineal_theta, lineal_prime_theta
 from TP3.src.utils import compute_error_multilayer
-from TP5.src.utils import get_letters, test_network
+from TP4.src.hopfieldUtils import find_most_orthonormal_vectors
+from TP5.src.utils import get_letters, test_network, get_labels_by_letters
 
 
 def pixel_error(output, expected):
@@ -26,6 +27,8 @@ def pixel_error(output, expected):
 
 def main():
     letters_pattern = get_letters()
+    letters_pattern = find_most_orthonormal_vectors(letters_pattern,5)[0]
+    print('sali de aca')
     # random.shuffle(letters_pattern)
     layer1 = layer_n_neurons(35, hyp_tan_theta, hyp_tan_prime_theta)
     layer2 = layer_n_neurons(25, hyp_tan_theta, hyp_tan_prime_theta)
@@ -42,7 +45,8 @@ def main():
 
     n.initialize(input_count=35)
     array = letters_pattern[:10]
-    error = multilayer_perceptron(letters_pattern, letters_pattern, compute_error_multilayer, 10000, 0.5, n)
+
+    error = multilayer_perceptron(letters_pattern, letters_pattern, compute_error_multilayer, 1, 0.5, n)
     # n = create_weighted_network([[[-0.007623226899276862, 0.6379977084465845, -0.42350015181970485, 0.44160813448430225,
     #                                0.07198661718231007, -0.7573232003999759, -0.1263507337800636, 0.674787421511741,
     #                                -0.2001833965352593, -0.12003451353820459, 0.2225636271556391, 0.605004864332068,
@@ -593,8 +597,7 @@ def main():
     (encoder, decoder) = n.get_decoder_encoder()
     test_network(letters_pattern, n)
 
-    labels = ["`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s",
-              "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~", "DEL"]
+    labels = get_labels_by_letters(letters_pattern)
     x_component = []
     y_component = []
 
