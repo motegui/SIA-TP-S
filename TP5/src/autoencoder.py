@@ -17,10 +17,10 @@ from TP5.src.utils import get_letters, test_network, get_labels_by_letters
 def autoencoder(input_data, output_data):
     # random.shuffle(letters_pattern)
     layer1 = layer_n_neurons(35, hyp_tan_theta, hyp_tan_prime_theta)
-    layer2 = layer_n_neurons(25, hyp_tan_theta, hyp_tan_prime_theta)
+    layer2 = layer_n_neurons(10, hyp_tan_theta, hyp_tan_prime_theta)
     layer3 = layer_n_neurons(25, hyp_tan_theta, hyp_tan_prime_theta)
     layer4 = layer_n_neurons(2, hyp_tan_theta, hyp_tan_prime_theta, is_latent=True)
-    layer5 = layer_n_neurons(25, hyp_tan_theta, hyp_tan_prime_theta)
+    layer5 = layer_n_neurons(10, hyp_tan_theta, hyp_tan_prime_theta)
     layer6 = layer_n_neurons(25, hyp_tan_theta, hyp_tan_prime_theta)
     layer7 = layer_n_neurons(35, hyp_tan_theta, hyp_tan_prime_theta)
     layer8 = layer_n_neurons(2, hyp_tan_theta, hyp_tan_prime_theta)
@@ -33,7 +33,7 @@ def autoencoder(input_data, output_data):
 
     nor = [[-1 if elemento == 0 else elemento for elemento in fila] for fila in output_data]
 
-    error = multilayer_perceptron(input_data, nor, compute_error_multilayer, 5000, 0.5, n)
+    error = multilayer_perceptron(input_data, nor, compute_error_multilayer, 20000, 0.5, n)
     print(n.forward_propagation(input_data[1]))
     print(input_data[1])
     return n
