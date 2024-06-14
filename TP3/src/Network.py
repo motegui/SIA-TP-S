@@ -46,6 +46,9 @@ class Network:
                     if config.get("optimizer") == "adam":
                         layer.neurons[j].adam(epoch)
 
+                    if config.get("optimizer") == "momentum":
+                        layer.neurons[j].momentum_optimizer(epoch)
+
                     prev_deltas.append(layer.neurons[j].delta)
             else:
                 # calcular delta -> funcion norma

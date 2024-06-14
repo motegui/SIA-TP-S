@@ -11,9 +11,14 @@ class Neuron:
         self.prime_theta = prime_theta
         self.weights = weights
         self.inputs = []
-        #adam parameters
+        # adam parameters
         self.m = None
         self.v = None
+        # momentum_parameters
+        self.momentum = None
+        # momentum_parameters
+        self.momentum = None
+        self.delta_w = None
 
     def compute_output(self):
         t = np.multiply(self.inputs, self.weights)
@@ -34,6 +39,7 @@ class Neuron:
 
     def set_weights(self, weights):
         self.weights = weights
+        self.momentum = np.zeros_like(weights)  # Initialize momentum with the same shape as weights
 
     def compute_delta(self, prev_deltas, connected_weights):
         self.delta = sum(np.multiply(prev_deltas, connected_weights)) * self.prime_theta(self.compute_excitement())
@@ -49,6 +55,10 @@ class Neuron:
         m_hat = self.m / (1 - config.get("b1") ** (epoch + 1))
         v_hat = self.v / (1 - config.get("b2") ** (epoch + 1))
         self.delta_w = config.get("step") * m_hat / (np.sqrt(v_hat) + config.get("e"))
+
+    def momentum_optimizer(self, epoch):
+        self.momentum = config.get("momentum") * self.momentum + self.delta_w
+        self.delta_w -= self.momentum
 
     def __str__(self):
         # return str(str(self.weights), str(self.inputs), str(self.delta))
