@@ -29,7 +29,7 @@ def pixel_error(output, expected):
 
 def main():
     letters_pattern = get_letters()
-    letters_pattern = find_most_orthonormal_vectors(letters_pattern, 5)[0][-1]
+    # letters_pattern = find_most_orthonormal_vectors(letters_pattern, 5)[0][-1]
     print('sali de aca')
     network = autoencoder(letters_pattern, letters_pattern)
     encoder, decoder = network.get_decoder_encoder()

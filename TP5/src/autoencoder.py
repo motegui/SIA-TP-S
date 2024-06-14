@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 from TP3.src.Network import Network, layer_n_neurons, create_weighted_network
 from TP3.src.Layer import Layer
 from TP3.src.Neuron import Neuron
+from TP3.src.normalization import normalize
 from TP3.src.perceptron import multilayer_perceptron
 from TP3.src.theta_functions import hyp_tan_theta, hyp_tan_prime_theta, logistic_theta, logistic_prime_theta, \
     lineal_theta, lineal_prime_theta
@@ -30,7 +31,9 @@ def autoencoder(input_data, output_data):
 
     n.initialize(input_count=35)
 
-    error = multilayer_perceptron(input_data, output_data, compute_error_multilayer, 5000, 0.5, n)
+    nor = [[-1 if elemento == 0 else elemento for elemento in fila] for fila in output_data]
+
+    error = multilayer_perceptron(input_data, nor, compute_error_multilayer, 5000, 0.5, n)
     print(n.forward_propagation(input_data[1]))
     print(input_data[1])
     return n

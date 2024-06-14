@@ -1,5 +1,5 @@
 {
-  "beta": 0.5,
+  "beta": 0.3,
   "epsilon": 0.2,
   "theta": {
     "name": "lineal",

@@ -4,7 +4,7 @@ from TP3.src.normalization import *
 
 
 def random_initialize_weight(dim):
-    return [random.random() for _ in range(dim + 1)]
+    return [random.uniform(-1,1) for _ in range(dim + 1)]
 
 
 def compute_error(data, w, theta):
