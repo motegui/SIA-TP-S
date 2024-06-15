@@ -33,15 +33,15 @@ def autoencoder(input_data, output_data):
 
     nor = [[-1 if elemento == 0 else elemento for elemento in fila] for fila in output_data]
 
-    error = multilayer_perceptron(input_data, nor, compute_error_multilayer, 20000, 0.5, n)
+    error = multilayer_perceptron(input_data, nor, compute_error_multilayer, 20000000, 0.1, n)
     print(n.forward_propagation(input_data[1]))
     print(input_data[1])
     return n
 
 
-def plot_latent_space(input_data, encoder):
+def plot_latent_space(clean_letters, input_data, encoder):
 
-    labels = get_labels_by_letters(input_data)
+    labels = get_labels_by_letters(clean_letters)
     x_component = []
     y_component = []
 

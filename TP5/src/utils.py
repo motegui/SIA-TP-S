@@ -1,3 +1,4 @@
+import random
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -19,16 +20,23 @@ def get_letters():
     return matrix
 
 
-def test_network(input_data, output_data, network):
+def test_network(input_data, output_data, network, print_errors=True):
     labels = get_labels_by_letters(output_data)
+    forward = []
+    errors = []
     for j, letter in enumerate(input_data):
         l = network.forward_propagation(letter)
         l = [1 if let >= 0 else 0 for let in l]
+        forward.append(l)
         let_error = 0
         for i in range(0, len(letter)):
             if output_data[j][i] != l[i]:
                 let_error += 1
-        print(f'Letter {labels[j]}, error {let_error} \n')
+        if print_errors:
+            print(f'Letter {labels[j]}, error {let_error} \n')
+        errors.append(let_error)
+
+    return forward, input_data, output_data, errors
 
 
 def get_letters_map():
@@ -88,11 +96,13 @@ def get_labels_by_letters(letters):
 
 
 def plot_letters(letters):
+    plt.clf()
     fig, axs = plt.subplots(4, 4)
 
     # Mostrar los gráficos
 
     for i, ax in enumerate(axs.flat):
+        if i == len(letters): break
         matriz = np.array(letters[i]).reshape(7, 5)
         # Graficar la matriz sin escalas ni números de ejes
         ax.imshow(matriz, cmap='nipy_spectral_r', interpolation='nearest')
@@ -105,6 +115,7 @@ def plot_letters(letters):
     # Ajustar el espaciado entre los subplots
     plt.tight_layout()
     plt.show()
+
 
 
 def cast_letter(letter):
@@ -144,6 +155,34 @@ def noise_letters(letters, cant, noise_proportion):
             noisy.append(noisy_array)
 
     return noisy, clean
+
+
+def remove_part(letters, cant):
+    removed_letters = []
+    clean_letters = []
+    for letter in letters:
+        for i in range(cant):
+            clean_letters.append(letter)
+            matriz = np.array(letter).reshape((7, 5))
+
+            # Seleccionar un elemento aleatorio
+            fila_random = random.randint(0, 6)
+            col_random = random.randint(0, 4)
+
+            # Crear una lista de posiciones vecinas (incluyendo diagonales)
+            vecinos = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+
+            # Convertir el elemento aleatorio y sus vecinos en 0
+            for dr, dc in vecinos + [(0, 0)]:
+                fila = fila_random + dr
+                col = col_random + dc
+                if 0 <= fila < 7 and 0 <= col < 5:
+                    matriz[fila, col] = 0
+
+            # Convertir la matriz de vuelta en un array de 35 elementos
+            removed_letters.append(matriz.flatten().tolist())
+
+    return removed_letters,clean_letters
 
 
 if __name__ == '__main__':

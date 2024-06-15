@@ -12,7 +12,7 @@ from TP3.src.utils import compute_error_multilayer
 from TP4.src.hopfieldUtils import find_most_orthonormal_vectors
 from TP5.src.autoencoder import autoencoder, plot_latent_space
 from TP5.src.utils import get_letters, test_network, get_labels_by_letters, generar_puntos_entre, cast_letter, \
-    plot_letters, noise_letters
+    plot_letters, noise_letters, remove_part
 
 
 def pixel_error(output, expected):
@@ -34,7 +34,7 @@ def ej1():
     print('sali de aca')
     network = autoencoder(letters_pattern, letters_pattern)
     encoder, decoder = network.get_decoder_encoder()
-    plot_latent_space(letters_pattern, encoder)
+    plot_latent_space(letters_pattern,letters_pattern, encoder)
     test_network(letters_pattern, letters_pattern, network)
 
     # voy a agarrar dos componentes del espacio latente, y me voy a ir moviendo de uno para el otro.
@@ -58,14 +58,39 @@ def ej1():
     # lo que me devuelva el decder lo tengo que pasar por un conversor de unos y 0's y finalmente graficarlos
 
 def ej2():
-    letters_pattern = get_letters()
-    # letters_pattern = find_most_orthonormal_vectors(letters_pattern, 5)[0][-1]
-    letters = noise_letters(letters_pattern, 2, 0.1)
+    letters_pattern = get_letters()[2:20]
+    letters_pattern = find_most_orthonormal_vectors(letters_pattern, 6)[0][-1]
+    letters = noise_letters(letters_pattern, 3, 0.15)
     network = autoencoder(letters[0], letters[1])
     encoder, decoder = network.get_decoder_encoder()
-    plot_latent_space(letters_pattern, encoder)
-    test_network(noise_letters(letters_pattern,1,0.1,), letters_pattern, network)
+    plot_latent_space(letters_pattern,letters[0][:6], encoder)
+    for i in np.arange(0,1, 0.05):
+        out, noisy, clean, error = test_network(noise_letters(letters_pattern,1,i)[0], letters_pattern, network, print_errors=False)
+        plotted = []
+        for o,n,c in zip(out[:6], noisy[:6], clean[:6]):
+            plotted.append(n)
+            plotted.append(o)
+            plotted.append(c)
+        plot_letters(plotted)
+        mean = np.mean(error)
+        print(f'mean ERROR: {mean}')
 
+
+def removed_part():
+    letters_pattern = get_letters()
+    letters_pattern = find_most_orthonormal_vectors(letters_pattern, 5)[0][-2]
+    print('im out!')
+    letters = remove_part(letters_pattern,3)
+    network = autoencoder(letters[0],letters[1])
+    encoder, decoder = network.get_decoder_encoder()
+    plot_latent_space(letters_pattern, remove_part(letters_pattern,1)[0], encoder)
+    out, noisy, clean = test_network(remove_part(letters_pattern,1)[0], letters_pattern, network)
+    for o, n, c in zip(out[:5], noisy[:5], clean[:5]):
+        plot_letters([n, o, c])
+
+
+
+    # no noisy, pero sacandole una parte
     # # voy a agarrar dos componentes del espacio latente, y me voy a ir moviendo de uno para el otro.
     # l1 = letters_pattern[1]
     # l2 = letters_pattern[2]
@@ -88,9 +113,10 @@ def ej2():
 
 def main():
 
-    ej1()
+    # ej1()
 
     ej2()
+    # removed_part()
 
 if __name__ == '__main__':
     main()
