@@ -98,5 +98,7 @@ def create_weighted_network(weights, theta, prime_theta):
         neurons = []
         for neuron_weights in layer:
             neurons.append(Neuron(weights=neuron_weights, theta=theta, prime_theta=prime_theta))
-        layers.append(Layer(neurons, len(neurons) == 2))
+        lay = Layer(neurons, len(neurons) == 2)
+        lay.reset_deltas()
+        layers.append(lay)
     return Network(layers)
