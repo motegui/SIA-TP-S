@@ -93,11 +93,25 @@ def get_labels_by_letters(letters):
         labels.append(label)
 
     return labels
+def plot_progress(l1,l2,encoder, decoder):
+    p1 = encoder.forward_propagation(l1)
+    p2 = encoder.forward_propagation(l2)
+
+    points = generar_puntos_entre(p1, p2, 14)
+    letters = [l1]
+    for point in points:
+        letter = decoder.forward_propagation([point[0], point[1]])
+        letter = cast_letter(letter)
+        letters.append(letter)
+    letters.append(l2)
+
+    plot_letters(letters)
 
 
-def plot_letters(letters):
+
+def plot_letters(letters, row=4, col=4):
     plt.clf()
-    fig, axs = plt.subplots(4, 4)
+    fig, axs = plt.subplots(row, col)
 
     # Mostrar los gráficos
 
@@ -119,7 +133,7 @@ def plot_letters(letters):
 
 
 def cast_letter(letter):
-    return [let.round().astype(int) for let in letter]
+    return [0 if let<=0 else 1 for let in letter]
 
 
 def generar_puntos_entre(coordenada1, coordenada2, cantidad=10):
@@ -166,8 +180,12 @@ def remove_part(letters, cant):
             matriz = np.array(letter).reshape((7, 5))
 
             # Seleccionar un elemento aleatorio
+
             fila_random = random.randint(0, 6)
             col_random = random.randint(0, 4)
+            while matriz[fila_random][col_random] == 0:
+                fila_random = random.randint(0, 6)
+                col_random = random.randint(0, 4)
 
             # Crear una lista de posiciones vecinas (incluyendo diagonales)
             vecinos = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
