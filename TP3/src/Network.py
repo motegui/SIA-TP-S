@@ -32,6 +32,9 @@ class Network:
             inputs = layer.updated_forward(inputs)
         return inputs
 
+    def fix_weights(self):
+        self.layers[0].fix_weights()
+
     def back_propagation(self, forward_output, expected_output, epoch):
         prev_deltas = []
         for i in range(len(self.layers) - 1, -1, -1):
@@ -55,6 +58,30 @@ class Network:
                 connected_weights = self.layers[i + 1].get_weights()
                 prev_deltas = layer.compute_deltas(prev_deltas, connected_weights, epoch)
             return prev_deltas
+
+    def back_propagation2(self, forward_output, expected_output, epoch, grad):
+        prev_deltas = grad  # Start with the given gradients
+        for i in range(len(self.layers) - 1, -1, -1):
+            layer = self.layers[i]
+            if i == len(self.layers) - 1:
+                # For the last layer in the encoder (first layer of backpropagation)
+                for j in range(len(layer.neurons)):
+
+                    layer.neurons[j].delta = grad[j]  # Use the provided gradient directly
+
+                    layer.neurons[j].delta_w += gradient_descend(config.get("step"), layer.neurons[j])
+                    if config.get("optimizer") == "adam":
+                        layer.neurons[j].adam(epoch)
+
+                    if config.get("optimizer") == "momentum":
+                        layer.neurons[j].momentum_optimizer(epoch)
+
+                    prev_deltas[j] = layer.neurons[j].delta
+            else:
+                # For other layers, calculate delta normally
+                connected_weights = self.layers[i + 1].get_weights()
+                prev_deltas = layer.compute_deltas(prev_deltas, connected_weights, epoch)
+        return prev_deltas
 
     def get_weights(self):
         weights = []
@@ -83,15 +110,18 @@ class Network:
     def get_decoder_encoder(self):
         for i in range(0, len(self.layers)):
             if self.layers[i].is_latent:
-                return Network(self.layers[:i + 1]), Network(self.layers[i + 1:])
+                encoder = Network(self.layers[:i + 1])
+                decoder = Network(self.layers[i + 1:])
+                decoder.fix_weights()
+                return encoder, decoder
 
 
-def layer_n_neurons(neuron_count, theta, prime_theta, is_latent=False):
+def layer_n_neurons(neuron_count, theta, prime_theta, is_latent=False, is_decoder=False):
     neurons = []
     for i in range(neuron_count):
         neuron = Neuron(theta, prime_theta)
         neurons.append(neuron)
-    return Layer(neurons, is_latent)
+    return Layer(neurons, is_latent, is_decoder)
 
 def create_weighted_network(weights, theta, prime_theta):
     layers = []
