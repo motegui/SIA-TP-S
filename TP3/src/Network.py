@@ -4,6 +4,7 @@ from TP3.src.Layer import *
 from TP3.config import config
 from TP3.src.Neuron import Neuron
 from TP3.src.optimization import gradient_descend
+from TP3.src.theta_functions import hyp_tan_theta, hyp_tan_prime_theta
 
 
 class Network:
@@ -57,7 +58,7 @@ class Network:
                 # calcular delta -> funcion norma
                 connected_weights = self.layers[i + 1].get_weights()
                 prev_deltas = layer.compute_deltas(prev_deltas, connected_weights, epoch)
-            return prev_deltas
+        return prev_deltas
 
     def back_propagation2(self, forward_output, expected_output, epoch, grad):
         prev_deltas = grad  # Start with the given gradients
@@ -126,6 +127,10 @@ def layer_n_neurons(neuron_count, theta, prime_theta, is_latent=False, is_decode
 def create_weighted_network(weights, theta, prime_theta):
     layers = []
     for layer in weights:
+        if len(layer) == 2:
+            theta = hyp_tan_theta
+            prime_theta = hyp_tan_prime_theta
+
         neurons = []
         for neuron_weights in layer:
             neurons.append(Neuron(weights=neuron_weights, theta=theta, prime_theta=prime_theta))
