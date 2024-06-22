@@ -54,7 +54,6 @@ class Network:
                 # calcular delta -> funcion norma
                 connected_weights = self.layers[i + 1].get_weights()
                 prev_deltas = layer.compute_deltas(prev_deltas, connected_weights, epoch)
-            return prev_deltas
 
     def get_weights(self):
         weights = []
