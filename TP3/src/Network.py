@@ -60,24 +60,18 @@ class Network:
                 prev_deltas = layer.compute_deltas(prev_deltas, connected_weights, epoch)
         return prev_deltas
 
-    def back_propagation2(self, forward_output, expected_output, epoch, grad):
+    def back_propagation2(self, epoch, grad):
         prev_deltas = grad  # Start with the given gradients
         for i in range(len(self.layers) - 1, -1, -1):
             layer = self.layers[i]
             if i == len(self.layers) - 1:
-                # For the last layer in the encoder (first layer of backpropagation)
-                for j in range(len(layer.neurons)):
 
-                    layer.neurons[j].delta = grad[j]  # Use the provided gradient directly
+                # ACA HAY QUE FIXEAR CREO. hay que hacer el enganche como para que siga la backprop.
+                # Tiene que ser casi igual al else (porque no hay que hacer lo de calcular de nuevo los deltas)
+                # pero me da dudas el tema de usar connected_weights como todos 1.
 
-                    layer.neurons[j].delta_w += gradient_descend(config.get("step"), layer.neurons[j])
-                    if config.get("optimizer") == "adam":
-                        layer.neurons[j].adam(epoch)
-
-                    if config.get("optimizer") == "momentum":
-                        layer.neurons[j].momentum_optimizer(epoch)
-
-                    prev_deltas[j] = layer.neurons[j].delta
+                connected_weights = np.ones((len(prev_deltas), len(layer.neurons)))
+                prev_deltas = layer.compute_deltas(prev_deltas, connected_weights, epoch)
             else:
                 # For other layers, calculate delta normally
                 connected_weights = self.layers[i + 1].get_weights()
@@ -123,6 +117,7 @@ def layer_n_neurons(neuron_count, theta, prime_theta, is_latent=False, is_decode
         neuron = Neuron(theta, prime_theta)
         neurons.append(neuron)
     return Layer(neurons, is_latent, is_decoder)
+
 
 def create_weighted_network(weights, theta, prime_theta):
     layers = []

@@ -29,50 +29,51 @@ def vae(input_data, expected_output, compute_error_function, limit, epsilon, net
     while min_error > epsilon and i < limit:
         input_copy = input_data.copy()
         expected_copy = expected_output.copy()
-        for _ in range(batch_size):
-            u = random.randint(0, len(input_copy) - 1)
+        for i in range(batch_size):
+            u = np.random.randint(0, len(input_copy))
             x = input_copy[u]
             exp = expected_copy[u]
+
             result = encoder.forward_propagation(x)
-            mu = result[:int(len(result) / 2)]
-            sigma = result[int(len(result) / 2):]
+            mu = result[:len(result) // 2]
+            sigma = result[len(result) // 2:]
 
-            z, eps = reparameterization_trick(mu, sigma) # z tiene (a, b)
+            z, eps = reparameterization_trick(mu, sigma)
+            z = np.concatenate(([1], z))  # Añadir bias si es necesario
 
-            z = np.concatenate(([1], z))
             output = decoder.forward_propagation(z)
+
+            # reconstruction_loss = np.mean((output - exp) ** 2)  # Usamos MSE como ejemplo
+            # kl_loss = -0.5 * np.sum(1 + np.log(sigma ** 2) - mu ** 2 - sigma ** 2)
+            # total_loss = reconstruction_loss + kl_loss
 
             last_decoder_deltas = decoder.back_propagation(output, exp, i)
 
-            dE_dmu = last_decoder_deltas[:4]
-            dE_dsigma = eps * np.array(last_decoder_deltas[:4])
+            dE_dz = last_decoder_deltas
 
-            gradients = np.concatenate((dE_dmu, dE_dsigma))
-            encoder.back_propagation2(np.zeros(len(gradients)), gradients, i, gradients)
+            dE_dmu = dE_dz
+            dE_dsigma = np.multiply(dE_dz, eps)  #reparam
 
-            dL_dm = np.multiply(mu, -1)
-            dL_dv = -0.5 * (np.exp(sigma) - 1)
-            error = np.concatenate((dL_dm, dL_dv))
-            # compute_activation = network.forward_propagation(x)
-            # network.back_propagation(compute_activation, exp, i)  # me modifica los delta w
-            input_copy.remove(x)
-            expected_copy.remove(exp)
+            dE_dmu_sigma = np.concatenate((dE_dmu,dE_dsigma))
+
+            encoder.back_propagation(dE_dmu_sigma, dE_dmu_sigma, i)  # Asegúrate de que esta función maneje adecuadamente los gradientes
         error = compute_error_VAE([input_data, input_data], network)
         if i % 1000 == 0:
             print_to_CSV('multilayer_perceptron_errors.csv', error, i)
+
+        if error < min_error:
+            min_error = error
+            network.update_layer_weights()
+            network.reset_deltas()
         print(error)
-
-        # if error < min_error:
-        # min_error = error
-        network.update_layer_weights()
-
-        network.reset_deltas()
         i += 1
     return min_error, network
 
 
-def reparameterization_trick(mu, sigma):
+def reparameterization_trick(mu, sigma, fixed=False):
     eps = np.random.standard_normal()
+    if fixed:
+        eps = 1
     return np.array(mu) + np.array(sigma) * eps, eps
 
 
@@ -95,7 +96,7 @@ def compute_error_VAE(data, network):
         mu = result[:int(len(result) / 2)]
         sigma = result[int(len(result) / 2):]
 
-        z, eps = reparameterization_trick(mu, sigma)
+        z, eps = reparameterization_trick(mu, sigma, fixed=True)
         z = np.insert(z, 0, 1)
 
         output = decoder.forward_propagation(z)
@@ -107,29 +108,22 @@ def compute_error_VAE(data, network):
 
 if __name__ == '__main__':
     # random.shuffle(letters_pattern)
-    layer1 = layer_n_neurons(5, hyp_tan_theta, hyp_tan_prime_theta)
-    layer22 = layer_n_neurons(25, lineal_theta, lineal_prime_theta)
-    layer23 = layer_n_neurons(25, lineal_theta, lineal_prime_theta)
-    layer24 = layer_n_neurons(25, lineal_theta, lineal_prime_theta)
-    layer25 = layer_n_neurons(25, lineal_theta, lineal_prime_theta)
-    layer26 = layer_n_neurons(5, hyp_tan_theta, hyp_tan_prime_theta)
-    layer2 = layer_n_neurons(25, lineal_theta, lineal_prime_theta)
-    layer3 = layer_n_neurons(25, lineal_theta, lineal_prime_theta)
-    layer4 = layer_n_neurons(25, hyp_tan_theta, hyp_tan_prime_theta)
-    layer5 = layer_n_neurons(4, lineal_theta, lineal_prime_theta, is_latent=True)
-    layer6 = layer_n_neurons(25, lineal_theta, lineal_prime_theta)
-    layer7 = layer_n_neurons(35, hyp_tan_theta, hyp_tan_prime_theta)
-    layer8 = layer_n_neurons(25, hyp_tan_theta, hyp_tan_prime_theta, is_decoder=True)
-    layer9 = layer_n_neurons(5, hyp_tan_theta, hyp_tan_prime_theta)
-    layer10 = layer_n_neurons(5, hyp_tan_theta, hyp_tan_prime_theta)
-    layer11 = layer_n_neurons(35, hyp_tan_theta, hyp_tan_prime_theta)
-    layer12 = layer_n_neurons(35, hyp_tan_theta, hyp_tan_prime_theta)
-    layer13 = layer_n_neurons(35, hyp_tan_theta, hyp_tan_prime_theta)
-    layer14 = layer_n_neurons(35, hyp_tan_theta, hyp_tan_prime_theta)
-    layer15 = layer_n_neurons(35, hyp_tan_theta, hyp_tan_prime_theta)
+    # 35 5 4 4 5 35
 
-    n = Network(
-        [layer1, layer26, layer2, layer5, layer8, layer9, layer10, layer15])
+    layers = [
+      # layer_n_neurons(            35, hyp_tan_theta, hyp_tan_prime_theta),
+        layer_n_neurons(5, hyp_tan_theta, hyp_tan_prime_theta),
+        layer_n_neurons(15, hyp_tan_theta, hyp_tan_prime_theta),
+        layer_n_neurons(15, hyp_tan_theta, hyp_tan_prime_theta),
+        layer_n_neurons(4, lineal_theta, lineal_prime_theta, is_latent=True),
+        layer_n_neurons(15, hyp_tan_theta, hyp_tan_prime_theta, is_decoder=True),
+        layer_n_neurons(15, hyp_tan_theta, hyp_tan_prime_theta),
+        layer_n_neurons(5, hyp_tan_theta, hyp_tan_prime_theta),
+        layer_n_neurons(35, hyp_tan_theta, hyp_tan_prime_theta)
+    ]
+
+
+    n = Network(layers)
     n.initialize(input_count=35)
 
     letters = get_letters()
