@@ -25,11 +25,12 @@ def vae(input_data, expected_output, compute_error_function, limit, epsilon, net
     if os.path.exists(csv_path):
         os.remove(csv_path)
     encoder, decoder = network.get_decoder_encoder()
+    decoder.initialize(input_count=2)
 
     while min_error > epsilon and i < limit:
         input_copy = input_data.copy()
         expected_copy = expected_output.copy()
-        for i in range(batch_size):
+        for _ in range(batch_size):
             u = np.random.randint(0, len(input_copy))
             x = input_copy[u]
             exp = expected_copy[u]
@@ -38,10 +39,10 @@ def vae(input_data, expected_output, compute_error_function, limit, epsilon, net
             mu = result[:len(result) // 2]
             sigma = result[len(result) // 2:]
 
-            z, eps = reparameterization_trick(mu, sigma)
-            z = np.concatenate(([1], z))  # Añadir bias si es necesario
+            z, eps = reparameterization_trick(np.array(mu), np.array(sigma))
+            # z = np.concatenate(([0], z))  # Añadir bias si es necesario
 
-            output = decoder.forward_propagation(z)
+            output = decoder.forward_propagation(z.tolist())
 
             # reconstruction_loss = np.mean((output - exp) ** 2)  # Usamos MSE como ejemplo
             # kl_loss = -0.5 * np.sum(1 + np.log(sigma ** 2) - mu ** 2 - sigma ** 2)
@@ -52,11 +53,11 @@ def vae(input_data, expected_output, compute_error_function, limit, epsilon, net
             dE_dz = last_decoder_deltas
 
             dE_dmu = dE_dz
-            dE_dsigma = np.multiply(dE_dz, eps)  #reparam
+            dE_dsigma = np.multiply(dE_dz, eps)  # reparam
 
-            dE_dmu_sigma = np.concatenate((dE_dmu,dE_dsigma))
+            dE_dmu_sigma = np.concatenate((dE_dmu, dE_dsigma.tolist()))
 
-            encoder.back_propagation(dE_dmu_sigma, dE_dmu_sigma, i)  # Asegúrate de que esta función maneje adecuadamente los gradientes
+            encoder.back_propagation2(i, dE_dmu_sigma.tolist())
         error = compute_error_VAE([input_data, input_data], network)
         if i % 1000 == 0:
             print_to_CSV('multilayer_perceptron_errors.csv', error, i)
@@ -64,8 +65,8 @@ def vae(input_data, expected_output, compute_error_function, limit, epsilon, net
         if error < min_error:
             min_error = error
             network.update_layer_weights()
-            network.reset_deltas()
-        print(error)
+            print(error)
+        network.reset_deltas()
         i += 1
     return min_error, network
 
@@ -74,7 +75,7 @@ def reparameterization_trick(mu, sigma, fixed=False):
     eps = np.random.standard_normal()
     if fixed:
         eps = 1
-    return np.array(mu) + np.array(sigma) * eps, eps
+    return mu + sigma * eps, eps
 
 
 def get_reconstruction_error(output_data, expected_output, mu, sigma):
@@ -86,6 +87,7 @@ def get_reconstruction_error(output_data, expected_output, mu, sigma):
     kl = -0.5 * np.sum(1 + sigma - mu ** 2 - np.exp(sigma))
     return rec + kl
 
+
 def compute_error_VAE(data, network):
     input_data = data[0]
     expected_output = data[1]
@@ -93,17 +95,21 @@ def compute_error_VAE(data, network):
     encoder, decoder = network.get_decoder_encoder()
     for i in range(len(input_data)):
         result = encoder.forward_propagation(input_data[i])
-        mu = result[:int(len(result) / 2)]
-        sigma = result[int(len(result) / 2):]
+        mu = np.array(result[:int(len(result) / 2)])  # Convertir mu a un array de Numpy
+        sigma = np.array(result[int(len(result) / 2):])  # Convertir sigma a un array de Numpy
 
         z, eps = reparameterization_trick(mu, sigma, fixed=True)
-        z = np.insert(z, 0, 1)
+        # z = np.insert(z, 0, 1)
 
-        output = decoder.forward_propagation(z)
+        output = decoder.forward_propagation(z.tolist())
         t = np.square(np.array(output) - np.array(expected_output[i]))
 
-        errors.append(sum(t))
+        reconstruction_error = sum(t)
+        kl_error = -0.5 * np.sum(1 + np.log(sigma ** 2) - mu ** 2 - sigma ** 2)  # Calcular el error KL
+        total_error = reconstruction_error + kl_error
+        errors.append(total_error)
     return sum(errors) * 0.5
+
 
 
 if __name__ == '__main__':
@@ -111,7 +117,7 @@ if __name__ == '__main__':
     # 35 5 4 4 5 35
 
     layers = [
-      # layer_n_neurons(            35, hyp_tan_theta, hyp_tan_prime_theta),
+        # layer_n_neurons(            35, hyp_tan_theta, hyp_tan_prime_theta),
         layer_n_neurons(5, hyp_tan_theta, hyp_tan_prime_theta),
         layer_n_neurons(15, hyp_tan_theta, hyp_tan_prime_theta),
         layer_n_neurons(15, hyp_tan_theta, hyp_tan_prime_theta),
@@ -122,7 +128,6 @@ if __name__ == '__main__':
         layer_n_neurons(35, hyp_tan_theta, hyp_tan_prime_theta)
     ]
 
-
     n = Network(layers)
     n.initialize(input_count=35)
 
@@ -130,7 +135,7 @@ if __name__ == '__main__':
 
     nor = [[-1 if elemento == 0 else elemento for elemento in fila] for fila in letters]
 
-    error = vae(letters[:10], nor[:10], compute_error_VAE, 100000, 0, n)
+    error = vae(letters[:10], nor[:10], compute_error_VAE, 10000, 0, n)
     print(error)
 
     encoder, decoder = n.get_decoder_encoder()

@@ -20,11 +20,19 @@ class Network:
     def forward_propagation(self, input_data):
         inputs = input_data
         i = 0
+        last_layer_latent = False
         for layer in self.layers:
             i += 1
             # print(inputs, i)
-            inputs = layer.forward(inputs)
+            if layer.is_decoder and last_layer_latent:
+                z, _ = reparameterization_trick(inputs[:len(inputs) // 2], inputs[len(inputs) // 2:])
+                inputs = layer.forward(z.tolist())
+                last_layer_latent = False
+            else:
+                inputs = layer.forward(inputs)
 
+            if layer.is_latent:
+                last_layer_latent = True
         return inputs
 
     def updated_forward_propagation(self, input_data):
@@ -70,7 +78,7 @@ class Network:
                 # Tiene que ser casi igual al else (porque no hay que hacer lo de calcular de nuevo los deltas)
                 # pero me da dudas el tema de usar connected_weights como todos 1.
 
-                connected_weights = np.ones((len(prev_deltas), len(layer.neurons)))
+                connected_weights = np.ones((len(prev_deltas), len(layer.neurons) + 1))
                 prev_deltas = layer.compute_deltas(prev_deltas, connected_weights, epoch)
             else:
                 # For other layers, calculate delta normally
@@ -107,7 +115,7 @@ class Network:
             if self.layers[i].is_latent:
                 encoder = Network(self.layers[:i + 1])
                 decoder = Network(self.layers[i + 1:])
-                decoder.fix_weights()
+                # decoder.fix_weights()
                 return encoder, decoder
 
 
@@ -133,3 +141,9 @@ def create_weighted_network(weights, theta, prime_theta):
         lay.reset_deltas()
         layers.append(lay)
     return Network(layers)
+
+def reparameterization_trick(mu, sigma, fixed=False):
+    eps = np.random.standard_normal()
+    if fixed:
+        eps = 1
+    return np.array(mu) + np.array(sigma) * eps, eps
