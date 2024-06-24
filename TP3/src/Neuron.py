@@ -21,8 +21,8 @@ class Neuron:
         self.delta_w = None
 
     def compute_output(self):
-        t = np.multiply(self.inputs, self.weights)
-        return self.theta(sum(t))
+        t = np.dot(self.inputs, self.weights)
+        return self.theta(t)
 
     def compute_updated_output(self):
         return self.theta(sum(np.multiply(self.inputs, np.array(self.weights) + np.array(self.delta_w))))

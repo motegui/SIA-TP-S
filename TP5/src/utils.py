@@ -1,8 +1,6 @@
 import random
 import numpy as np
 from matplotlib import pyplot as plt
-
-from TP3.src.utils import create_numbers_with_noise
 from TP5.data.font import Font3 as Font
 
 
@@ -93,7 +91,9 @@ def get_labels_by_letters(letters):
         labels.append(label)
 
     return labels
-def plot_progress(l1,l2,encoder, decoder):
+
+
+def plot_progress(l1, l2, encoder, decoder):
     p1 = encoder.forward_propagation(l1)
     p2 = encoder.forward_propagation(l2)
 
@@ -106,7 +106,6 @@ def plot_progress(l1,l2,encoder, decoder):
     letters.append(l2)
 
     plot_letters(letters)
-
 
 
 def plot_letters(letters, row=4, col=4):
@@ -131,9 +130,8 @@ def plot_letters(letters, row=4, col=4):
     plt.show()
 
 
-
 def cast_letter(letter):
-    return [0 if let<=0 else 1 for let in letter]
+    return [0 if let <= 0 else 1 for let in letter]
 
 
 def generar_puntos_entre(coordenada1, coordenada2, cantidad=10):
@@ -200,43 +198,53 @@ def remove_part(letters, cant):
             # Convertir la matriz de vuelta en un array de 35 elementos
             removed_letters.append(matriz.flatten().tolist())
 
-    return removed_letters,clean_letters
+    return removed_letters, clean_letters
 
 
-if __name__ == '__main__':
-    letters = get_letters()
-    plot_letters(noise_letters(letters, 2, 0.1)[0])
+def test_emoji_network(input_data, output_data, network, print_errors=True):
+    labels = ['carita feliz', 'carita triste', 'carita aburrida', 'carita sorprendida', 'flecha arriba', 'flecha abajo',
+              'cruz', 'tick']
+    forward = []
+    errors = []
+    for j, letter in enumerate(input_data):
+        l = network.forward_propagation(letter)
+        l = [1 if let >= 0 else 0 for let in l]
+        forward.append(l)
+        let_error = 0
+        for i in range(0, len(letter)):
+            if output_data[j][i] != l[i]:
+                let_error += 1
+        if print_errors:
+            print(f'Letter {labels[j]}, error {let_error} \n')
+        errors.append(let_error)
 
-    # plot_letters(
-    #     [[0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #      [0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1],
-    #      [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0],
-    #      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0],
-    #      [0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1],
-    #      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-    #      [0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
-    #      [0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0],
-    #      [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
-    #      [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0],
-    #      [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0],
-    #      [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0],
-    #      [0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-    #      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
-    #      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
-    #      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0],
-    #      [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-    #      [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-    #      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-    #      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0],
-    #      [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0],
-    #      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1],
-    #      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0],
-    #      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-    #      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1],
-    #      [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0],
-    #      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1],
-    #      [0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0],
-    #      [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-    #      [0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0],
-    #      [0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]])
+    return forward, input_data, output_data, errors
+
+
+def plot_emoji_progress(l1, l2, encoder, decoder):
+    emojis = []
+    grid_x = np.linspace(l1, l2, 15)
+    grid_y = np.linspace(l1, l2, 15)[::-1]
+    for i, yi in enumerate(grid_y):
+        for j, xi in enumerate(grid_x):
+            emoji = decoder.forward_propagation([yi, xi])
+            emojis.append(emoji)
+
+    plot_emojis(emojis)
+
+
+def plot_emojis(emojis):
+    plt.clf()
+    fig, axs = plt.subplots(15, 15, figsize=(10, 10))
+    fig.patch.set_facecolor('black')
+
+    # Mostrar los gráficos
+
+    for i, ax in enumerate(axs.flat):
+        if i == len(emojis): break
+        matriz = np.array(emojis[i]).reshape(8, 8)
+        ax.imshow(matriz, cmap='Greys_r', interpolation='nearest')
+        ax.axis('off')
+        ax.set_facecolor('black')  # Cambiar el color de fondo de los ejes a negro
+    plt.subplots_adjust(wspace=0.5, hspace=0.5)
+    plt.show()

@@ -28,7 +28,6 @@ def main():
     for i in range(len(df['country'])):
         texts.append(plt.text(df['pc1'][i], df['pc2'][i], df['country'][i], fontsize=30, color='#336699'))
 
-    # adjust_text(texts, arrowprops=dict(arrowstyle='->', color='gray', lw=0.5))
     plt.show()
 
 if __name__ == '__main__':

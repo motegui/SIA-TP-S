@@ -5,10 +5,11 @@ from TP3.src.utils import *
 
 
 class Layer:
-    def __init__(self, neurons=None, is_latent=False):
+    def __init__(self, neurons=None, is_latent=False, is_decoder=False):
         self.neurons = neurons
         self.neuron_len = len(neurons)
         self.is_latent = is_latent
+        self.is_decoder = is_decoder
 
     def forward(self, inputs):
         out = []
@@ -26,6 +27,9 @@ class Layer:
 
     def populate_weights(self, input_count=None):
         for neuron in self.neurons:
+            # if self.is_decoder:
+            #     weights = random_initialize_weight(2)
+            # else:
             weights = random_initialize_weight(input_count)
             neuron.set_weights(weights)  # aca hay que agregar el bias
             neuron.delta_w = np.zeros_like(neuron.weights)
@@ -56,3 +60,10 @@ class Layer:
 
     def __str__(self):
         return '\n'.join([str(neuron) for neuron in self.neurons])
+
+    def fix_weights(self):
+        for neuron in self.neurons:
+            neuron.weights = [0] + random_initialize_weight(1)
+            neuron.delta_w = np.zeros_like(neuron.weights)
+            neuron.m = np.zeros_like(neuron.weights)
+            neuron.v = np.zeros_like(neuron.weights)

@@ -1,5 +1,5 @@
 {
-  "beta": 0.3,
+  "beta": 1,
   "epsilon": 0.2,
   "theta": {
     "name": "lineal",
@@ -13,6 +13,5 @@
   "b1": 0.9,
   "b2": 0.999,
   "e": 10e-8,
-  "batch_size": 1,
-  "momentum": 0.5
+  "batch_size": 1
 }
